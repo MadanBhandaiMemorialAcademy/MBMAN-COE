@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 Internal Server Error - School of Science and Technology, MBMAN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mbman: {
+                            blue: '#06437a', // Primary Brand Color
+                            gold: '#d97706', // Accent gold/amber
+                            light: '#f3f4f6',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-mbman-light text-gray-800 antialiased flex flex-col min-h-screen">
+
+    <!-- TOP BAR (Contact Info) -->
+    <div class="bg-white text-gray-600 py-2 text-xs md:text-sm border-b">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <span><i class="fas fa-phone-alt mr-2 text-mbman-blue"></i>+977-021-540000</span>
+                <span class="hidden md:inline"><i class="fas fa-envelope mr-2 text-mbman-blue"></i>info@mbman.edu.np</span>
+            </div>
+            <div class="flex items-center space-x-4 opacity-80">
+                <a href="#" class="hover:text-mbman-blue transition"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-mbman-blue transition"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-mbman-blue transition"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Logo Area -->
+            <a href="index.html" class="flex items-center space-x-3 group">
+                <div class="h-12 w-12 bg-mbman-blue rounded-xl rotate-3 group-hover:rotate-0 transition duration-300 flex items-center justify-center text-white font-bold text-2xl shadow-md">
+                    M
+                </div>
+                <div class="leading-tight">
+                    <h1 class="text-mbman-blue font-extrabold text-xl tracking-tight">School of Science & Technology</h1>
+                    <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Madan Bhandari Memorial Academy Nepal</p>
+                </div>
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden lg:flex items-center">
+                <div class="flex items-center space-x-8 font-medium text-gray-700 text-[15px]">
+                    <a href="index.html" class="hover:text-mbman-blue transition">Home</a>
+                    <a href="index.html#programs" class="hover:text-mbman-blue transition">Programs</a>
+                    <a href="index.html#notices" class="hover:text-mbman-blue transition">Notices</a>
+                    <a href="index.html#faculty" class="hover:text-mbman-blue transition">Faculty</a>
+                    <a href="index.html#about" class="hover:text-mbman-blue transition">About</a>
+                    <a href="index.html#contact" class="hover:text-mbman-blue transition">Contact Us</a>
+                </div>
+
+                <!-- User/Login Section -->
+                <div class="flex items-center space-x-5 ml-8 border-l border-gray-200 pl-8">
+                    <!-- User Dropdown -->
+                    <div class="relative" id="user-dropdown-container">
+                        <button id="user-dropdown-btn" class="text-gray-600 text-sm font-medium flex items-center hover:text-mbman-blue transition focus:outline-none">
+                            <i class="far fa-user-circle mr-2 text-mbman-blue text-lg"></i>
+                            Welcome, User
+                            <i class="fas fa-chevron-down text-xs ml-2 transition-transform"></i>
+                        </button>
+                        <div id="user-dropdown-menu" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-xl z-50 border border-gray-100 py-1 overflow-hidden">
+                            <a href="/manage-account" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-mbman-blue transition">Manage Account</a>
+                            <a href="/other-stuff" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-mbman-blue transition">Other Stuff</a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition">Logout</a>
+                        </div>
+                    </div>
+                    <!-- Login Button -->
+                    <div id="login-section-desktop">
+                        <a href="/login" class="px-5 py-2 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition shadow-sm font-semibold text-sm">
+                            Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-700 focus:outline-none p-2">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t pb-4 px-4 shadow-lg">
+            <a href="index.html" class="block py-3 border-b text-gray-700">Home</a>
+            <a href="index.html#programs" class="block py-3 border-b text-gray-700">Programs</a>
+            <a href="index.html#notices" class="block py-3 border-b text-gray-700">Notices</a>
+            <a href="index.html#faculty" class="block py-3 border-b text-gray-700">Faculty</a>
+            <a href="index.html#about" class="block py-3 border-b text-gray-700">About Us</a>
+            <a href="index.html#contact" class="block py-3 border-b text-gray-700">Contact Us</a>
+            <!-- Mobile User/Login -->
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                 <div id="user-section-mobile">
+                    <div class="flex items-center mb-4 px-1">
+                        <i class="far fa-user-circle mr-3 text-mbman-blue text-xl"></i>
+                        <span class="text-gray-700 font-medium">Welcome, User</span>
+                    </div>
+                    <div class="flex flex-col space-y-2 mt-4">
+                        <a href="/manage-account" class="block w-full text-left px-5 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition font-medium">Manage Account</a>
+                        <a href="/other-stuff" class="block w-full text-left px-5 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition font-medium">Other Stuff</a>
+                        <a href="/logout" class="block w-full text-center px-5 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-sm font-semibold mt-2">Logout</a>
+                    </div>
+                 </div>
+                 <div id="login-section-mobile" class="mt-4">
+                    <a href="/login" class="block w-full text-center px-5 py-3 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition shadow-sm font-semibold">Student / Staff Login</a>
+                 </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 500 CONTENT SECTION -->
+    <main class="flex-grow">
+        <section class="py-24 md:py-32 bg-white">
+            <div class="container mx-auto px-4 text-center">
+                <i class="fas fa-server text-8xl text-mbman-gold mb-8"></i>
+                <h1 class="text-7xl md:text-9xl font-extrabold text-mbman-blue mb-4">500</h1>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Internal Server Error</h2>
+                <p class="text-lg text-gray-600 max-w-lg mx-auto mb-10">
+                    We're sorry, but something went wrong on our end. Our team has been notified. Please try again later.
+                </p>
+                <a href="index.html" class="inline-block px-8 py-4 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition shadow-lg font-semibold text-lg">
+                    <i class="fas fa-home mr-2"></i> Go to Homepage
+                </a>
+            </div>
+        </section>
+    </main>
+    
+    <!-- FOOTER -->
+    <footer id="contact" class="bg-gray-900 text-gray-400 pt-16 pb-8">
+        <div class="container mx-auto px-4 grid md:grid-cols-4 gap-8 mb-12">
+            <div class="col-span-1 md:col-span-2">
+                <h2 class="text-white text-2xl font-bold mb-4">MBMAN School of Science & Technology</h2>
+                <p class="mb-6 pr-6">Empowering students with the technical skills and ethical grounding needed to lead in the 21st century. A proud constituent of Madan Bhandari Memorial Academy Nepal.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 bg-gray-800 flex items-center justify-center rounded-full hover:bg-mbman-blue hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 flex items-center justify-center rounded-full hover:bg-mbman-blue hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 flex items-center justify-center rounded-full hover:bg-mbman-blue hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 flex items-center justify-center rounded-full hover:bg-mbman-blue hover:text-white transition"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-white font-bold mb-4">Contact Us</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <i class="fas fa-map-marker-alt mt-1 mr-3 text-mbman-gold"></i>
+                        <span>Urlabari-3, Morang,<br>Koshi Province, Nepal</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-phone-alt mr-3 text-mbman-gold"></i>
+                        <span>+977-021-540000</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-envelope mr-3 text-mbman-gold"></i>
+                        <span>info@mbman.edu.np</span>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-white font-bold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="bit.html" class="hover:text-mbman-gold transition">BIT Program</a></li>
+                    <li><a href="ag.html" class="hover:text-mbman-gold transition">BSc. Ag Program</a></li>
+                    <li><a href="#" class="hover:text-mbman-gold transition">Admission Procedures</a></li>
+                    <li><a href="#" class="hover:text-mbman-gold transition">Scholarship Info</a></li>
+                    <li><a href="#" class="hover:text-mbman-gold transition">Staff Login</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 pt-8 text-center text-sm">
+            <p>© 2025 School of Science & Technology, MBMAN. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // User Dropdown Toggle
+        const userDropdownBtn = document.getElementById('user-dropdown-btn');
+        const userDropdownMenu = document.getElementById('user-dropdown-menu');
+        const userDropdownContainer = document.getElementById('user-dropdown-container');
+        if (userDropdownBtn) {
+            userDropdownBtn.addEventListener('click', () => {
+                userDropdownMenu.classList.toggle('hidden');
+            });
+            window.addEventListener('click', (e) => {
+                if (userDropdownContainer && !userDropdownContainer.contains(e.target)) {
+                    if (userDropdownMenu) {
+                        userDropdownMenu.classList.add('hidden');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

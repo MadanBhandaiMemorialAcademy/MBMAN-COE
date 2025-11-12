@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MBMAN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mbman: {
+                            blue: '#06437a', // Primary Brand Color
+                            gold: '#d97706', // Accent gold/amber
+                            light: '#f3f4f6',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Sidebar Link Styling */
+        .admin-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: #d1d5db; /* gray-300 */
+        }
+        .admin-nav-link:hover {
+            background-color: #374151; /* gray-700 */
+            color: #ffffff;
+        }
+        .admin-nav-link.active {
+            background-color: #06437a; /* mbman-blue */
+            color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .admin-nav-link i {
+            width: 1.25rem; /* w-5 */
+            margin-right: 0.75rem; /* mr-3 */
+            text-align: center;
+        }
+
+        /* Form Input Styling */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+            transition: all 0.2s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #06437a; /* border-mbman-blue */
+            box-shadow: 0 0 0 2px rgba(6, 67, 122, 0.3); /* ring-2 ring-mbman-blue ring-opacity-30 */
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem; /* mb-2 */
+            font-weight: 500; /* font-medium */
+            color: #374151; /* text-gray-700 */
+        }
+
+        /* Page transition */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        /* Custom scrollbar for sidebar (optional) */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #4b5563; /* gray-600 */
+            border-radius: 3px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+            background: #374151; /* gray-700 */
+        }
+
+        /* Tab styling for curriculum */
+        .curriculum-tab-btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .curriculum-tab-btn.active {
+            border-bottom-color: #06437a;
+            color: #06437a;
+        }
+        .curriculum-tab-btn:not(.active) {
+            color: #6b7280; /* text-gray-500 */
+        }
+        .curriculum-tab-btn:not(.active):hover {
+            background-color: #f9fafb; /* bg-gray-50 */
+            color: #111827; /* text-gray-900 */
+        }
+
+        .curriculum-tab-content {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+
+    </style>
+</head>
+<body class="h-full">
+
+    <div class="flex flex-col lg:flex-row min-h-screen">
+        <!-- SIDEBAR -->
+        <aside class="w-full lg:w-72 bg-gray-900 text-gray-300 flex-shrink-0 flex flex-col shadow-lg z-10">
+            <!-- Logo/Header -->
+            <div class="px-6 py-6 flex items-center justify-between border-b border-gray-700">
+                <div class="flex items-center space-x-3">
+                    <div class="h-10 w-10 bg-mbman-blue rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        M
+                    </div>
+                    <div>
+                        <h1 class="text-white font-bold text-lg leading-tight">Admin Portal</h1>
+                        <p class="text-xs text-gray-400">MBMAN S&T</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="flex-1 px-6 py-6 space-y-2 overflow-y-auto sidebar-scroll">
+                <a href="#" class="admin-nav-link active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="#" class="admin-nav-link" data-page="notices">
+                    <i class="fas fa-bullhorn"></i> Manage Notices & Events
+                </a>
+                <a href="#" class="admin-nav-link" data-page="faculty">
+                    <i class="fas fa-users"></i> Manage Faculty
+                </a>
+                <a href="#" class="admin-nav-link" data-page="curriculum">
+                    <i class="fas fa-book-open"></i> Manage Curriculum
+                </a>
+                <a href="#" class="admin-nav-link" data-page="content">
+                    <i class="fas fa-pencil-alt"></i> Edit Page Content
+                </a>
+                <a href="#" class="admin-nav-link" data-page="settings">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </nav>
+
+            <!-- User/Footer -->
+            <div class="px-6 py-6 border-t border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <img class="h-10 w-10 rounded-full object-cover bg-gray-700" src="https://placehold.co/100x100/06437a/FFFFFF?text=A" alt="Admin User">
+                        <div>
+                            <p class="text-sm font-medium text-white">Admin User</p>
+                            <a href="mailto:admin@mbman.edu.np" class="text-xs text-gray-400 hover:text-mbman-blue transition">admin@mbman.edu.np</a>
+                        </div>
+                    </div>
+                    <a href="index.html" class="text-gray-400 hover:text-white transition" title="Logout & Go to Homepage">
+                        <i class="fas fa-sign-out-alt text-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 p-6 lg:p-10 bg-gray-100 overflow-y-auto">
+            
+            <!-- Page: Dashboard -->
+            <div id="page-dashboard" class="admin-page animate-fade-in">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Dashboard</h2>
+                
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex items-center space-x-4">
+                        <div class="h-12 w-12 bg-blue-100 text-mbman-blue rounded-full flex items-center justify-center text-xl">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">Total Notices</p>
+                            <p class="text-3xl font-bold text-gray-900">12</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex items-center space-x-4">
+                        <div class="h-12 w-12 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-xl">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">Total Faculty</p>
+                            <p class="text-3xl font-bold text-gray-900">28</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex items-center space-x-4">
+                        <div class="h-12 w-12 bg-amber-100 text-mbman-gold rounded-full flex items-center justify-center text-xl">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">Programs</p>
+                            <p class="text-3xl font-bold text-gray-900">2</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex items-center space-x-4">
+                        <div class="h-12 w-12 bg-gray-200 text-gray-700 rounded-full flex items-center justify-center text-xl">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">Views Today</p>
+                            <p class="text-3xl font-bold text-gray-900">1,420</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions & Live Edit -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="flex flex-wrap gap-4">
+                            <button id="quick-add-notice" class="flex-1 min-w-[150px] px-5 py-4 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition shadow font-semibold text-left">
+                                <i class="fas fa-plus mr-2"></i> Add New Notice
+                            </button>
+                            <button id="quick-add-faculty" class="flex-1 min-w-[150px] px-5 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow font-semibold text-left">
+                                <i class="fas fa-user-plus mr-2"></i> Add New Faculty
+                            </button>
+                            <button id="quick-edit-content" class="flex-1 min-w-[150px] px-5 py-4 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition shadow font-semibold text-left">
+                                <i class="fas fa-pencil-alt mr-2"></i> Edit Homepage
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Live Edit Mode</h3>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600 font-medium">Enable Live Editing</span>
+                            <div class="relative inline-block w-12 h-6" title="This feature requires backend integration to be enabled.">
+                                <input type="checkbox" id="edit-switch" class="absolute w-0 h-0 opacity-0" disabled>
+                                <label for="edit-switch" class="block w-full h-full bg-gray-300 rounded-full cursor-not-allowed"></label>
+                                <label for="edit-switch" class="absolute left-0 top-0 w-6 h-6 bg-white rounded-full shadow-md transition-transform transform cursor-not-allowed"></label>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">This feature is a visual prototype. <span class="font-bold text-red-600">(Requires Backend Integration)</span></p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Page: Manage Notices and Events -->
+            <div id="page-notices" class="admin-page hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Manage Notices & Events</h2>
+                    <button id="add-notice-btn" class="px-5 py-2 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition shadow-md font-semibold text-sm flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add New Notice/Event
+                    </button>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                    <!-- Search Bar -->
+                    <div class="mb-4">
+                        <label for="notice-search" class="sr-only">Search Notices</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input type="text" id="notice-search" class="form-input pl-10" placeholder="Search by title or date...">
+                        </div>
+                    </div>
+                    <!-- Table of Notices -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Date (B.S.)</th>
+                                    <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Title</th>
+                                    <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Description</th>
+                                    <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">File</th>
+                                    <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200" id="notice-table-body">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">Kartik 22, 2082</td>
+                                    <td class="px-6 py-4 font-medium text-gray-900">BIT First Semester Exam Schedule</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600 truncate max-w-xs">Revised schedule for the upcoming exams...</td>
+                                    <td class="px-6 py-4"><a href="#" class="text-mbman-blue hover:underline"><i class="fas fa-file-pdf mr-1"></i> schedule.pdf</a></td>
+                                    <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                                        <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                                        <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">Kartik 20, 2082</td>
+                                    <td class="px-6 py-4 font-medium text-gray-900">Scholarship Application Call</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600 truncate max-w-xs">Applications open for the Dean's Scholarship...</td>
+                                    <td class="px-6 py-4 text-gray-400 text-sm italic">None</td>
+                                    <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                                        <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                                        <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                                <!-- More rows... -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Manage Faculty -->
+            <div id="page-faculty" class="admin-page hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Manage Faculty</h2>
+                    <button id="add-faculty-btn" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-md font-semibold text-sm flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i> Add New Faculty
+                    </button>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                    <!-- Search Bar -->
+                    <div class="mb-4">
+                        <label for="faculty-search" class="sr-only">Search Faculty</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input type="text" id="faculty-search" class="form-input pl-10" placeholder="Search by name or department...">
+                        </div>
+                    </div>
+                    <!-- Table of Faculty -->
+                    <div class="overflow-x-auto">
+                         <table class="w-full text-left">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Photo</th>
+                                    <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Title / Designation</th>
+                                    <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Department</th>
+                                    <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200" id="faculty-table-body">
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <img src="https://placehold.co/100x100/06437a/FFFFFF?text=JD" alt="John Doe" class="h-10 w-10 rounded-full object-cover">
+                                    </td>
+                                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Er. John Doe</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">HOD, IT Department</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">IT</span></td>
+                                    <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                                        <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                                        <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                    <td class="px-6 py-4">
+                                        <img src="https://placehold.co/100x100/16a34a/FFFFFF?text=JS" alt="Jane Smith" class="h-10 w-10 rounded-full object-cover">
+                                    </td>
+                                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Dr. Jane Smith</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Assoc. Professor</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Agriculture</span></td>
+                                    <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                                        <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                                        <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Manage Curriculum -->
+            <div id="page-curriculum" class="admin-page hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900">Manage Curriculum</h2>
+                    <button id="add-course-btn" class="px-5 py-2 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition shadow-md font-semibold text-sm flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add New Course
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100">
+                    <!-- Program Tabs -->
+                    <div class="flex border-b border-gray-200">
+                        <button class="curriculum-tab-btn active" data-program="bit">BIT Curriculum</button>
+                        <button class="curriculum-tab-btn" data-program="ag">B.Sc. Ag Curriculum</button>
+                    </div>
+
+                    <!-- BIT Content -->
+                    <div class="curriculum-tab-content p-6" id="program-bit">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">BIT Courses</h3>
+                            <!-- Semester Select -->
+                            <div class="flex items-center space-x-3">
+                                <label for="bit-semester-select" class="form-label mb-0">Semester:</label>
+                                <select id="bit-semester-select" class="form-input w-48 py-2">
+                                    <option value="1">Semester I</option>
+                                    <option value="2">Semester II</option>
+                                    <option value="3">Semester III</option>
+                                    <option value="4">Semester IV</option>
+                                    <option value="5">Semester V</option>
+                                    <option value="6">Semester VI</option>
+                                    <option value="7">Semester VII</option>
+                                    <option value="8">Semester VIII</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- BIT Course Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Course Code</th>
+                                        <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Course Title</th>
+                                        <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Credit Hours</th>
+                                        <th class="px-6 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200" id="bit-course-table">
+                                    <!-- JS will populate this based on selection. Showing Sem I by default. -->
+                                    <tr>
+                                        <td class="px-6 py-4">BIT101</td>
+                                        <td class="px-6 py-4 font-medium">Introduction to Information Technology</td>
+                                        <td class="px-6 py-4">3</td>
+                                        <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                                            <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4">BIT102</td>
+                                        <td class="px-6 py-4 font-medium">C Programming</td>
+                                        <td class="px-6 py-4">3</td>
+                                        <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                                            <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- AG Content -->
+                    <div class="curriculum-tab-content p-6 hidden" id="program-ag">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-900">B.Sc. Ag Courses</h3>
+                            <!-- Semester Select -->
+                            <div class="flex items-center space-x-3">
+                                <label for="ag-semester-select" class="form-label mb-0">Semester:</label>
+                                <select id="ag-semester-select" class="form-input w-48 py-2">
+                                    <option value="1">Semester I</option>
+                                    <option value="2">Semester II</option>
+                                    <option value="3">Semester III</option>
+                                    <option value="4">Semester IV</option>
+                                    <option value="5">Semester V</option>
+                                    <option value="6">Semester VI</option>
+                                    <option value="7">Semester VII</option>
+                                    <option value="8">Semester VIII</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- AG Course Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-green-50 border-b border-gray-200">
+                                    <tr>
+                                        <th class="px-6 py-3 text-xs font-bold text-green-800 uppercase tracking-wider">Course Code</th>
+                                        <th class="px-6 py-3 text-xs font-bold text-green-800 uppercase tracking-wider">Course Title</th>
+                                        <th class="px-6 py-3 text-xs font-bold text-green-800 uppercase tracking-wider">Credit Hours</th>
+                                        <th class="px-6 py-3 text-xs font-bold text-green-800 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200" id="ag-course-table">
+                                    <!-- JS will populate this based on selection. Showing Sem I by default. -->
+                                    <tr>
+                                        <td class="px-6 py-4">AGR101</td>
+                                        <td class="px-6 py-4 font-medium">Principles of Agronomy</td>
+                                        <td class="px-6 py-4">3</td>
+                                        <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                                            <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                                            <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Edit Page Content -->
+            <div id="page-content" class="admin-page hidden animate-fade-in">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Edit Page Content</h2>
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+                    <form>
+                        <!-- Principal's Message -->
+                        <div class="mb-8">
+                            <label for="principal-message" class="form-label text-lg font-semibold">Principal's Message (Homepage)</label>
+                            <textarea id="principal-message" rows="6" class="form-input">It is my great pleasure to welcome you to the School of Science and Technology at Madan Bhandari Memorial Academy Nepal. Our institution is built on the vision of producing world-class graduates who are not only technically proficient but are also responsible citizens. We are committed to providing an environment of academic excellence, innovation, and research. Our dedicated faculty and state-of-the-art facilities for both BIT and B.Sc. Ag are here to support your journey. We believe in learning by doing, and our programs are designed to equip you with the practical skills needed to excel in your chosen field. Join us, and let's build the future together.</textarea>
+                        </div>
+                        
+                        <!-- BIT Overview -->
+                        <div class="mb-8">
+                            <label for="bit-overview" class="form-label text-lg font-semibold">BIT Program Overview (BIT Page)</label>
+                            <textarea id="bit-overview" rows="6" class="form-input">The Bachelor of Information Technology (BIT) program is designed to produce highly skilled IT professionals capable of meeting the challenges of the modern digital world. The curriculum provides a strong foundation in computer science, software development, data management, and network infrastructure. Students will gain hands-on experience in our state-of-the-art labs and are encouraged to participate in internships and real-world projects, ensuring they are job-ready upon graduation.</textarea>
+                        </div>
+
+                        <!-- AG Overview -->
+                        <div class="mb-8">
+                            <label for="ag-overview" class="form-label text-lg font-semibold">B.Sc. Ag Program Overview (AG Page)</label>
+                            <textarea id="ag-overview" rows="6" class="form-input">The B.Sc. Agriculture program is dedicated to developing the next generation of agricultural leaders, scientists, and entrepreneurs. Our curriculum provides a holistic understanding of agricultural science, from soil health and crop production to animal husbandry and economics. With extensive practical work on our research farms and field visits to key agricultural centers, students gain the hands-on skills necessary to build a sustainable and food-secure future for Nepal.</textarea>
+                        </div>
+
+                        <button type="submit" class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-lg font-semibold text-lg flex items-center">
+                            <i class="fas fa-save mr-2"></i> Save All Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Page: Settings (Placeholder) -->
+            <div id="page-settings" class="admin-page hidden animate-fade-in">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Settings</h2>
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Site Settings</h3>
+                    <p class="text-gray-600">This is a placeholder for future settings, such as changing the site logo, contact information, or social media links.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL for Add Notice -->
+    <div id="add-notice-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div id="modal-backdrop" class="fixed inset-0 bg-black opacity-60"></div>
+        <!-- Modal Content -->
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg z-10 mx-4 animate-fade-in" style="animation-duration: 0.2s;">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900">Add New Notice/Event</h3>
+                <button id="modal-close-btn" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="add-notice-form" class="p-6">
+                <div class="mb-4">
+                    <label for="notice-title" class="form-label">Title</label>
+                    <input type="text" id="notice-title" required class="form-input" placeholder="e.g., Exam Schedule Update">
+                </div>
+                <div class="mb-4">
+                    <label for="notice-date" class="form-label">Date (B.S.)</label>
+                    <input type="text" id="notice-date" required class="form-input" placeholder="e.g., Kartik 25, 2082">
+                </div>
+                <div class="mb-4">
+                    <label for="notice-desc" class="form-label">Description (Optional)</label>
+                    <textarea id="notice-desc" rows="3" class="form-input" placeholder="Short summary of the notice..."></textarea>
+                </div>
+                <div class="mb-6">
+                    <label for="notice-file" class="form-label">Optional PDF/Image</label>
+                    <input type="file" id="notice-file" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-mbman-blue hover:file:bg-blue-100 cursor-pointer">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="modal-cancel-btn" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium">Cancel</button>
+                    <button type="submit" class="px-6 py-2 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition font-semibold">Save Notice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL for Add Course -->
+    <div id="add-course-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div id="course-modal-backdrop" class="fixed inset-0 bg-black opacity-60"></div>
+        <!-- Modal Content -->
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg z-10 mx-4 animate-fade-in" style="animation-duration: 0.2s;">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900">Add New Course</h3>
+                <button id="course-modal-close-btn" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="add-course-form" class="p-6">
+                <!-- Program & Semester (Pre-filled by JS) -->
+                <input type="hidden" id="course-program" value="bit">
+                <input type="hidden" id="course-semester" value="1">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="form-label">Program</label>
+                        <p id="course-program-display" class="font-semibold text-lg text-mbman-blue">BIT</p>
+                    </div>
+                     <div>
+                        <label class="form-label">Semester</label>
+                        <p id="course-semester-display" class="font-semibold text-lg text-mbman-blue">Semester I</p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="course-code" class="form-label">Course Code</label>
+                    <input type="text" id="course-code" required class="form-input" placeholder="e.g., BIT103">
+                </div>
+                <div class="mb-4">
+                    <label for="course-title" class="form-label">Course Title</label>
+                    <input type="text" id="course-title" required class="form-input" placeholder="e.g., Digital Logic">
+                </div>
+                <div class="mb-6">
+                    <label for="course-credits" class="form-label">Credit Hours</label>
+                    <input type="number" id="course-credits" required class="form-input" placeholder="e.g., 3" min="1" max="6">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="course-modal-cancel-btn" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium">Cancel</button>
+                    <button type="submit" class="px-6 py-2 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition font-semibold">Save Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL for Add Faculty -->
+    <div id="add-faculty-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div id="faculty-modal-backdrop" class="fixed inset-0 bg-black opacity-60"></div>
+        <!-- Modal Content -->
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg z-10 mx-4 animate-fade-in" style="animation-duration: 0.2s;">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900">Add New Faculty</h3>
+                <button id="faculty-modal-close-btn" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="add-faculty-form" class="p-6">
+                <div class="mb-4">
+                    <label for="faculty-name" class="form-label">Full Name</label>
+                    <input type="text" id="faculty-name" required class="form-input" placeholder="e.g., Er. Ramesh Thapa">
+                </div>
+                <div class="mb-4">
+                    <label for="faculty-photo" class="form-label">Photo</label>
+                    <input type="file" id="faculty-photo" accept="image/*" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer">
+                </div>
+                <div class="mb-4">
+                    <label for="faculty-title" class="form-label">Title / Designation</label>
+                    <input type="text" id="faculty-title" required class="form-input" placeholder="e.g., Lecturer">
+                </div>
+                <div class="mb-6">
+                    <label for="faculty-dept" class="form-label">Department</label>
+                    <select id="faculty-dept" required class="form-input">
+                        <option value="IT">IT (BIT)</option>
+                        <option value="Agriculture">Agriculture (B.Sc. Ag)</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="faculty-modal-cancel-btn" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium">Cancel</button>
+                    <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">Save Faculty</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.admin-nav-link');
+            const pages = document.querySelectorAll('.admin-page');
+
+            // --- Admin Page Navigation ---
+            function switchPage(pageId) {
+                // Hide all pages
+                pages.forEach(page => {
+                    page.classList.add('hidden');
+                });
+                
+                // Deactivate all links
+                navLinks.forEach(navLink => {
+                    navLink.classList.remove('active');
+                });
+
+                // Show target page
+                const targetPage = document.getElementById(`page-${pageId}`);
+                if (targetPage) {
+                    targetPage.classList.remove('hidden');
+                }
+                
+                // Activate target link
+                const targetLink = document.querySelector(`.admin-nav-link[data-page="${pageId}"]`);
+                if(targetLink) {
+                    targetLink.classList.add('active');
+                }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('data-page');
+                    if (pageId) {
+                        switchPage(pageId);
+                    }
+                });
+            });
+
+            // --- Quick Actions ---
+            document.getElementById('quick-add-notice')?.addEventListener('click', () => {
+                switchPage('notices');
+                openNoticeModal();
+            });
+            document.getElementById('quick-add-faculty')?.addEventListener('click', () => {
+                switchPage('faculty');
+                openFacultyModal();
+            });
+            document.getElementById('quick-edit-content')?.addEventListener('click', () => switchPage('content'));
+
+
+            // --- Notice Modal Logic ---
+            const noticeModal = document.getElementById('add-notice-modal');
+            const addNoticeBtn = document.getElementById('add-notice-btn');
+            const cancelNoticeBtn = document.getElementById('modal-cancel-btn');
+            const closeNoticeBtn = document.getElementById('modal-close-btn');
+            const noticeBackdrop = document.getElementById('modal-backdrop');
+            const noticeForm = document.getElementById('add-notice-form');
+            const noticeTableBody = document.getElementById('notice-table-body');
+
+            const openNoticeModal = () => noticeModal.classList.remove('hidden');
+            const closeNoticeModal = () => noticeModal.classList.add('hidden');
+
+            if (addNoticeBtn) addNoticeBtn.addEventListener('click', openNoticeModal);
+            if (cancelNoticeBtn) cancelNoticeBtn.addEventListener('click', closeNoticeModal);
+            if (closeNoticeBtn) closeNoticeBtn.addEventListener('click', closeNoticeModal);
+            if (noticeBackdrop) noticeBackdrop.addEventListener('click', closeNoticeModal);
+
+            if (noticeForm) {
+                noticeForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const title = document.getElementById('notice-title').value;
+                    const date = document.getElementById('notice-date').value;
+                    const desc = document.getElementById('notice-desc').value;
+                    const file = document.getElementById('notice-file').files[0];
+
+                    const fileHTML = file 
+                        ? `<a href="#" class="text-mbman-blue hover:underline"><i class="fas fa-file-alt mr-1"></i> ${file.name}</a>`
+                        : `<span class="text-gray-400 text-sm italic">None</span>`;
+                    const descHTML = desc ? desc : `<span class="text-gray-400 text-sm italic">No description</span>`;
+
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">${date}</td>
+                        <td class="px-6 py-4 font-medium text-gray-900">${title}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600 truncate max-w-xs">${descHTML}</td>
+                        <td class="px-6 py-4">${fileHTML}</td>
+                        <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                            <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    `;
+                    if (noticeTableBody) noticeTableBody.prepend(newRow);
+                    noticeForm.reset();
+                    closeNoticeModal();
+                });
+            }
+
+            // --- Faculty Modal Logic ---
+            const facultyModal = document.getElementById('add-faculty-modal');
+            const addFacultyBtn = document.getElementById('add-faculty-btn');
+            const cancelFacultyBtn = document.getElementById('faculty-modal-cancel-btn');
+            const closeFacultyBtn = document.getElementById('faculty-modal-close-btn');
+            const facultyBackdrop = document.getElementById('faculty-modal-backdrop');
+            const facultyForm = document.getElementById('add-faculty-form');
+            const facultyTableBody = document.getElementById('faculty-table-body');
+
+            const openFacultyModal = () => facultyModal.classList.remove('hidden');
+            const closeFacultyModal = () => facultyModal.classList.add('hidden');
+
+            if (addFacultyBtn) addFacultyBtn.addEventListener('click', openFacultyModal);
+            if (cancelFacultyBtn) cancelFacultyBtn.addEventListener('click', closeFacultyModal);
+            if (closeFacultyBtn) closeFacultyBtn.addEventListener('click', closeFacultyModal);
+            if (facultyBackdrop) facultyBackdrop.addEventListener('click', closeFacultyModal);
+
+            if (facultyForm) {
+                facultyForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('faculty-name').value;
+                    const title = document.getElementById('faculty-title').value;
+                    const dept = document.getElementById('faculty-dept').value;
+                    const photo = document.getElementById('faculty-photo').files[0];
+
+                    const photoURL = photo ? URL.createObjectURL(photo) : 'https://placehold.co/100x100/6b7280/FFFFFF?text=?';
+
+                    const deptHTML = (dept === 'IT')
+                        ? `<span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">IT</span>`
+                        : `<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Agriculture</span>`;
+
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td class="px-6 py-4">
+                            <img src="${photoURL}" alt="${name}" class="h-10 w-10 rounded-full object-cover">
+                        </td>
+                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${name}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${title}</td>
+                        <td class="px-6 py-4">${deptHTML}</td>
+                        <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                            <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    `;
+                    if (facultyTableBody) facultyTableBody.prepend(newRow);
+                    facultyForm.reset();
+                    closeFacultyModal();
+                });
+            }
+
+
+            // --- Page Content Form (Fake Save) ---
+            const contentForm = document.querySelector('#page-content form');
+            if (contentForm) {
+                contentForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const saveBtn = contentForm.querySelector('button[type="submit"]');
+                    const originalText = saveBtn.innerHTML;
+                    saveBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Saved!';
+                    saveBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    saveBtn.classList.add('bg-green-500');
+                    
+                    setTimeout(() => {
+                        saveBtn.innerHTML = originalText;
+                        saveBtn.classList.remove('bg-green-500');
+                        saveBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                    }, 2000);
+                });
+            }
+
+            // --- Curriculum Page Logic ---
+            const curriculumTabs = document.querySelectorAll('.curriculum-tab-btn');
+            const curriculumContents = document.querySelectorAll('.curriculum-tab-content');
+            
+            curriculumTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const program = tab.dataset.program;
+
+                    // Deactivate all tabs
+                    curriculumTabs.forEach(t => t.classList.remove('active'));
+                    // Hide all contents
+                    curriculumContents.forEach(c => c.classList.add('hidden'));
+
+                    // Activate clicked tab
+                    tab.classList.add('active');
+                    // Show target content
+                    document.getElementById(`program-${program}`).classList.remove('hidden');
+                });
+            });
+
+            // --- Curriculum Modal Logic ---
+            const courseModal = document.getElementById('add-course-modal');
+            const addCourseBtn = document.getElementById('add-course-btn');
+            const cancelCourseBtn = document.getElementById('course-modal-cancel-btn');
+            const closeCourseBtn = document.getElementById('course-modal-close-btn');
+            const courseBackdrop = document.getElementById('course-modal-backdrop');
+            const courseForm = document.getElementById('add-course-form');
+
+            const openCourseModal = () => {
+                // Before opening, set the modal's hidden fields to match the current view
+                const activeProgramTab = document.querySelector('.curriculum-tab-btn.active');
+                const program = activeProgramTab.dataset.program; // 'bit' or 'ag'
+                const semesterSelect = document.getElementById(`${program}-semester-select`);
+                const semester = semesterSelect.value;
+                const semesterText = semesterSelect.options[semesterSelect.selectedIndex].text;
+
+                document.getElementById('course-program').value = program;
+                document.getElementById('course-semester').value = semester;
+                document.getElementById('course-program-display').textContent = (program === 'bit') ? 'BIT' : 'B.Sc. Ag';
+                document.getElementById('course-semester-display').textContent = semesterText;
+                
+                courseModal.classList.remove('hidden');
+            };
+            const closeCourseModal = () => courseModal.classList.add('hidden');
+
+            if (addCourseBtn) addCourseBtn.addEventListener('click', openCourseModal);
+            if (cancelCourseBtn) cancelCourseBtn.addEventListener('click', closeCourseModal);
+            if (closeCourseBtn) closeCourseBtn.addEventListener('click', closeCourseModal);
+            if (courseBackdrop) courseBackdrop.addEventListener('click', closeCourseModal);
+
+            if (courseForm) {
+                courseForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const program = document.getElementById('course-program').value;
+                    const semester = document.getElementById('course-semester').value;
+                    const code = document.getElementById('course-code').value;
+                    const title = document.getElementById('course-title').value;
+                    const credits = document.getElementById('course-credits').value;
+
+                    // This is a prototype. In a real app, you'd save this to the DB
+                    // and then re-fetch the courses for the current semester.
+                    // For now, just add it to the visible table if it matches.
+                    
+                    const currentProgramTab = document.querySelector('.curriculum-tab-btn.active').dataset.program;
+                    const currentSemesterSelect = document.getElementById(`${currentProgramTab}-semester-select`);
+                    const currentSemester = currentSemesterSelect.value;
+
+                    if (program === currentProgramTab && semester === currentSemester) {
+                        const tableBody = document.getElementById(`${program}-course-table`);
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                            <td class="px-6 py-4">${code}</td>
+                            <td class="px-6 py-4 font-medium">${title}</td>
+                            <td class="px-6 py-4">${credits}</td>
+                            <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                                <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                                <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        `;
+                        tableBody.appendChild(newRow);
+                    }
+                    
+                    courseForm.reset();
+                    closeCourseModal();
+                });
+            }
+
+            // --- Logic to "load" courses on semester change (PROTOTYPE) ---
+            // In a real app, this would be an API call.
+            const bitSemSelect = document.getElementById('bit-semester-select');
+            const agSemSelect = document.getElementById('ag-semester-select');
+            const bitCourseTable = document.getElementById('bit-course-table');
+            const agCourseTable = document.getElementById('ag-course-table');
+
+            const bitCourses = {
+                '1': [
+                    { code: 'BIT101', title: 'Introduction to Information Technology', credits: 3 },
+                    { code: 'BIT102', title: 'C Programming', credits: 3 },
+                    { code: 'BIT103', title: 'Digital Logic', credits: 3 },
+                ],
+                '2': [
+                    { code: 'BIT106', title: 'Object Oriented Programming (Java)', credits: 3 },
+                    { code: 'BIT107', title: 'Data Structures and Algorithms', credits: 3 },
+                ]
+            };
+            const agCourses = {
+                 '1': [
+                    { code: 'AGR101', title: 'Principles of Agronomy', credits: 3 },
+                    { code: 'BOT102', title: 'Agricultural Botany', credits: 3 },
+                 ],
+                 '2': [
+                    { code: 'HOR106', title: 'Introductory Horticulture', credits: 3 },
+                 ]
+            };
+
+            function populateTable(tableBody, courses) {
+                tableBody.innerHTML = ''; // Clear existing rows
+                if (!courses || courses.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 italic">No courses found for this semester.</td></tr>';
+                    return;
+                }
+                courses.forEach(course => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4">${course.code}</td>
+                        <td class="px-6 py-4 font-medium">${course.title}</td>
+                        <td class="px-6 py-4">${course.credits}</td>
+                        <td class="px-6 py-4 space-x-3 whitespace-nowrap">
+                            <button class="text-mbman-blue hover:text-blue-900" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            if(bitSemSelect) bitSemSelect.addEventListener('change', (e) => {
+                populateTable(bitCourseTable, bitCourses[e.target.value] || []);
+            });
+            if(agSemSelect) agSemSelect.addEventListener('change', (e) => {
+                populateTable(agCourseTable, agCourses[e.target.value] || []);
+            });
+
+            // Initial load (for prototype)
+            populateTable(bitCourseTable, bitCourses['1']);
+            populateTable(agCourseTable, agCourses['1']);
+
+        });
+    </script>
+</body>
+</html>

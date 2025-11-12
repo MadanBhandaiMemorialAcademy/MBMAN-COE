@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School of Science and Technology - MBMAN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mbman: {
+                            blue: '#06437a', // NEW Primary Brand Color
+                            gold: '#d97706', // Accent gold/amber
+                            light: '#f3f4f6',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Inter for clean, modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    </head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+    <!-- TOP BAR (Contact Info) -->
+    {% include 'components/topbar.html' %}
+    {% include 'components/navbar.html' %}
+    <!-- MAIN CONTENT -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <!-- FOOTER -->
+    {% include 'components/footer.html' %}
+
+
+
+   
+
