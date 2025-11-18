@@ -1,0 +1,29 @@
+---
+deployment:
+  tasks:
+    # CHANGE THIS → Folder where manage.py is located
+    - export PROJECT_ROOT=/home/mbmanedu/mbcoe.mbman.edu.np
+
+    - export VENV=$PROJECT_ROOT/venv
+
+    # Go to project folder
+    - cd $PROJECT_ROOT
+
+    # Create virtual environment if missing
+    - if [ ! -d "venv" ]; then python3 -m venv venv; fi
+
+    # Install dependencies
+    - . venv/bin/activate && pip install --upgrade pip
+    - . venv/bin/activate && pip install -r requirements.txt
+
+    # Apply migrations
+    - . venv/bin/activate && python manage.py migrate --noinput
+
+    # Collect static files
+    - . venv/bin/activate && python manage.py collectstatic --noinput
+
+    # Custom initialization command (YOUR PROJECT SUPPORTS THIS)
+    - . venv/bin/activate && python manage.py init_site_config
+
+    # Restart Passenger
+    - touch tmp/restart.txt
