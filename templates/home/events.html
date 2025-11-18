@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Events - Sagarmatha Ordinary School{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-gradient-to-r from-green-600 to-green-800 text-white py-16">
+    <div class="container mx-auto px-4">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Events</h1>
+        <p class="text-xl text-green-100">Stay updated with upcoming campus activities and programs</p>
+    </div>
+</section>
+
+<!-- Events Grid -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for event in events %}
+            <a href="{% url 'home:event_detail' event.pk %}" class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+                <div class="p-6">
+                    <!-- Highlight Badge -->
+                    {% if event.is_highlight %}
+                    <div class="mb-4">
+                        <span class="inline-block px-3 py-1 text-xs font-semibold text-gray-800 bg-yellow-400 rounded-full">
+                            <i class="fas fa-star mr-1"></i> FEATURED
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Event Title -->
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                        {{ event.title }}
+                    </h3>
+
+                    <!-- Event Description -->
+                    <p class="text-gray-600 mb-4 line-clamp-3">
+                        {{ event.description|truncatewords:30 }}
+                    </p>
+
+                    <!-- Event Meta -->
+                    <div class="space-y-2 text-sm text-gray-500">
+                        <div class="flex items-center">
+                            <i class="far fa-calendar mr-2 text-green-600"></i>
+                            <span>{{ event.date_bs }}</span>
+                        </div>
+                        {% if event.time %}
+                        <div class="flex items-center">
+                            <i class="far fa-clock mr-2 text-green-600"></i>
+                            <span>{{ event.time }}</span>
+                        </div>
+                        {% endif %}
+                        {% if event.location %}
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-green-600"></i>
+                            <span>{{ event.location }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-calendar-times text-6xl text-gray-300 mb-4"></i>
+                <p class="text-xl text-gray-500">No events available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

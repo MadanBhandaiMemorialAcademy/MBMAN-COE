@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}View Message - Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="mb-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Contact Message</h1>
+                    <p class="text-gray-500 mt-1">Message details</p>
+                </div>
+                <a href="{% url 'home:message_list' %}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Messages
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="h-12 w-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-bold">
+                            {{ message.name.0 }}
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">{{ message.name }}</h2>
+                            <p class="text-sm text-gray-600">{{ message.email }}</p>
+                            {% if message.phone %}
+                            <p class="text-sm text-gray-600"><i class="fas fa-phone mr-1"></i>{{ message.phone }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-clock mr-1"></i>{{ message.submitted_at|date:"F d, Y" }}
+                        </p>
+                        <p class="text-xs text-gray-400">{{ message.submitted_at|date:"h:i A" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Body -->
+            <div class="px-6 py-8">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase mb-3">Message</h3>
+                <div class="prose prose-gray max-w-none">
+                    <p class="text-gray-700 whitespace-pre-line">{{ message.message }}</p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+                <a href="mailto:{{ message.email }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm">
+                    <i class="fas fa-reply mr-2"></i>Reply via Email
+                </a>
+                <form method="post" action="{% url 'home:message_delete' message.pk %}" onsubmit="return confirm('Delete this message?');">
+                    {% csrf_token %}
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-sm">
+                        <i class="fas fa-trash mr-2"></i>Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

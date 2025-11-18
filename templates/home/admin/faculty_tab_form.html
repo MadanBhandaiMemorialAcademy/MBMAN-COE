@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-6">
+        <h2 class="text-3xl font-bold text-gray-900">{{ title }}</h2>
+        <p class="text-gray-600 mt-2">Configure faculty section tab settings</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Tab Name *</label>
+                {{ form.name }}
+                <p class="text-xs text-gray-500 mt-1">Display name shown on the tab button (e.g., "IT Department")</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Slug *</label>
+                {{ form.slug }}
+                <p class="text-xs text-gray-500 mt-1">URL-friendly identifier (lowercase, no spaces, e.g., "it", "agriculture")</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Department Filter *</label>
+                {{ form.department_filter }}
+                <p class="text-xs text-gray-500 mt-1">Must exactly match the Faculty member's department field</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Color Scheme</label>
+                {{ form.color_scheme }}
+                <p class="text-xs text-gray-500 mt-1">Choose a color theme for this tab</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Display Order</label>
+                {{ form.display_order }}
+                <p class="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
+            </div>
+
+            <div class="flex items-center">
+                {{ form.is_active }}
+                <label class="ml-2 text-sm font-medium text-gray-700">Active (show on homepage)</label>
+            </div>
+
+            <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                <a href="{% url 'home:faculty_tab_list' %}" class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold">
+                    Cancel
+                </a>
+                <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
+                    <i class="fas fa-save mr-2"></i>Save Faculty Tab
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} - Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="mb-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ title }}</h1>
+                    <p class="text-gray-500 mt-1">Add or edit slideshow image</p>
+                </div>
+                <a href="{% url 'home:slideshow_list' %}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+                    {{ form.title }}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Description (Optional)</label>
+                    {{ form.description }}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Image</label>
+                    {{ form.image }}
+                    <p class="text-xs text-gray-500 mt-1">Recommended: 1920x1080px for hero slides, 1200x800px for gallery</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Display Location</label>
+                        {{ form.display_location }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Display Order</label>
+                        {{ form.display_order }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Link URL (Optional)</label>
+                    {{ form.link_url }}
+                    <p class="text-xs text-gray-500 mt-1">Where to go when image is clicked</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">CTA Button Text (Optional, for hero slides)</label>
+                    {{ form.cta_text }}
+                </div>
+
+                <div class="flex items-center">
+                    {{ form.is_active }}
+                    <label class="ml-2 text-gray-700">Active (visible on site)</label>
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-4 border-t">
+                    <a href="{% url 'home:slideshow_list' %}" class="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-semibold">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
+                        <i class="fas fa-save mr-2"></i>Save Image
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

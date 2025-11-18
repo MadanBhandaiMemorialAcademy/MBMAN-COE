@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-gradient-to-r from-green-50 to-green-100 px-6 py-4 border-b border-green-200">
+            <h2 class="text-2xl font-bold text-gray-900">{{ title }}</h2>
+        </div>
+
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.semester_number.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">Semester Number</label>
+                {{ form.semester_number }}
+                {% if form.semester_number.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.semester_number.errors }}</p>
+                {% endif %}
+                <p class="text-gray-500 text-sm mt-1">Enter a number between 1 and 8</p>
+            </div>
+
+            <div>
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">Description (Optional)</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.description.errors }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex gap-3 pt-4 border-t border-gray-200">
+                <button type="submit" class="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">
+                    <i class="fas fa-save mr-2"></i>Save Semester
+                </button>
+                <a href="{% url 'home:curriculum_list' %}" class="px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-semibold">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

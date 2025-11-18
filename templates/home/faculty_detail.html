@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ faculty.name }} - Faculty{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center text-blue-100 mb-4 text-sm">
+            <a href="{% url 'home:index' %}" class="hover:text-white">Home</a>
+            <i class="fas fa-chevron-right mx-2"></i>
+            <a href="{% url 'home:index' %}#faculty" class="hover:text-white">Faculty</a>
+            <i class="fas fa-chevron-right mx-2"></i>
+            <span class="text-white">{{ faculty.name }}</span>
+        </div>
+        
+        <h1 class="text-3xl md:text-4xl font-bold mb-3">{{ faculty.name }}</h1>
+        <p class="text-xl text-blue-100">{{ faculty.designation }}</p>
+    </div>
+</section>
+
+<!-- Faculty Details -->
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <!-- Faculty Photo -->
+                    {% if faculty.photo %}
+                    <div class="mb-8 flex justify-center">
+                        <img src="{{ faculty.photo.url }}" alt="{{ faculty.name }}" 
+                             class="w-48 h-48 rounded-full object-cover border-4 border-blue-100 shadow-lg">
+                    </div>
+                    {% endif %}
+
+                    <!-- Biography -->
+                    {% if faculty.bio %}
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">
+                            <i class="fas fa-user-circle mr-2 text-blue-600"></i>About
+                        </h3>
+                        <p class="text-gray-700 text-lg leading-relaxed whitespace-pre-line">{{ faculty.bio }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Back Button -->
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <a href="{% url 'home:index' %}#faculty" 
+                           class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back to Faculty List
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Faculty Info Card -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Contact Information</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-briefcase text-blue-600 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-500">Position</p>
+                                <p class="font-medium text-gray-900">{{ faculty.designation }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <i class="fas fa-building text-blue-600 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-500">Department</p>
+                                <p class="font-medium text-gray-900">{{ faculty.get_department_display }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <i class="fas fa-graduation-cap text-blue-600 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-500">Qualification</p>
+                                <p class="font-medium text-gray-900">{{ faculty.qualification }}</p>
+                            </div>
+                        </div>
+
+                        {% if faculty.email %}
+                        <div class="flex items-start">
+                            <i class="fas fa-envelope text-blue-600 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-500">Email</p>
+                                <a href="mailto:{{ faculty.email }}" class="font-medium text-blue-600 hover:underline break-all">
+                                    {{ faculty.email }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if faculty.phone %}
+                        <div class="flex items-start">
+                            <i class="fas fa-phone text-blue-600 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-500">Phone</p>
+                                <a href="tel:{{ faculty.phone }}" class="font-medium text-blue-600 hover:underline">
+                                    {{ faculty.phone }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if faculty.website %}
+                        <div class="flex items-start">
+                            <i class="fas fa-globe text-blue-600 mt-1 mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-500">Website</p>
+                                <a href="{{ faculty.website }}" target="_blank" class="font-medium text-blue-600 hover:underline break-all">
+                                    {{ faculty.website }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Related Faculty -->
+                {% if related_faculty %}
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Other Faculty - {{ faculty.get_department_display }}</h3>
+                    <div class="space-y-4">
+                        {% for related in related_faculty %}
+                        <a href="{% url 'home:faculty_detail' related.pk %}" 
+                           class="block group hover:bg-gray-50 p-3 rounded-lg transition-colors duration-200">
+                            <div class="flex items-center">
+                                {% if related.photo %}
+                                <img src="{{ related.photo.url }}" alt="{{ related.name }}" 
+                                     class="w-12 h-12 rounded-full object-cover mr-3">
+                                {% else %}
+                                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-user text-blue-600"></i>
+                                </div>
+                                {% endif %}
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-medium text-gray-900 group-hover:text-blue-600 line-clamp-1">
+                                        {{ related.name }}
+                                    </h4>
+                                    <p class="text-xs text-gray-500 line-clamp-1">{{ related.designation }}</p>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

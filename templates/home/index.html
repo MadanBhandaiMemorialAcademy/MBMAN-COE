@@ -1,0 +1,553 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}School of Science and Technology - MBMAN{% endblock %}
+
+{% block inline_styles %}
+/* Custom scrollbar for notices */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Marquee Styles */
+.marquee-container {
+    display: flex;
+    overflow: hidden;
+    user-select: none;
+    gap: 2rem;
+}
+.marquee-content {
+    flex-shrink: 0;
+    display: flex;
+    gap: 2rem;
+    min-width: 100%;
+    animation: scroll 40s linear infinite;
+}
+.marquee-container:hover .marquee-content {
+    animation-play-state: paused;
+}
+@keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-100% - 2rem)); }
+}
+
+/* Fade In Animation for Tabs */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section id="home" class="relative h-[85vh] min-h-[600px] flex flex-col">
+    <!-- Background Image with Overlay -->
+    <div class="absolute inset-0 z-0">
+        {% if hero and hero.background_image %}
+        <img src="{{ hero.background_image.url }}" alt="{{ hero.title }}" class="w-full h-full object-cover">
+        {% else %}
+        <img src="https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80" alt="MBMAN Campus" class="w-full h-full object-cover">
+        {% endif %}
+        <div class="absolute inset-0 bg-gradient-to-r from-gray-900/95 via-mbman-blue/50 to-black/40"></div>
+    </div>
+
+    <!-- Main Hero Content -->
+    <div class="flex-grow flex items-center relative z-10 container mx-auto px-4">
+        <div class="max-w-4xl animate-fade-in-up pb-16">
+            {% if hero %}
+            <h2 class="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-6 text-white">
+                {{ hero.title|safe }}
+            </h2>
+            <p class="text-xl text-blue-100 max-w-2xl font-light leading-relaxed mb-10">
+                {{ hero.subtitle }}
+            </p>
+            <div class="flex flex-wrap items-center gap-6">
+                <a href="{{ hero.cta_link|default:'#apply' }}" class="px-10 py-4 bg-mbman-blue hover:bg-blue-900 text-white font-bold rounded-full transition transform hover:-translate-y-1 shadow-lg flex items-center border-2 border-white/20 hover:border-white/60">
+                    {{ hero.cta_text|default:'Apply Now' }} <i class="fas fa-arrow-right ml-3"></i>
+                </a>
+                <a href="#programs" class="text-white font-semibold hover:text-mbman-gold transition flex items-center group">
+                    Explore Programs <i class="fas fa-chevron-right ml-2 text-sm group-hover:translate-x-1 transition"></i>
+                </a>
+            </div>
+            {% else %}
+            <h2 class="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-6 text-white">
+                Future Leaders in <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-mbman-gold to-yellow-300">Technology</span> & <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300">Agriculture</span>
+            </h2>
+            <p class="text-xl text-blue-100 max-w-2xl font-light leading-relaxed mb-10">
+                Embark on a journey of practical excellence at Eastern Nepal's premier technical institute.
+            </p>
+            <div class="flex flex-wrap items-center gap-6">
+                <a href="#apply" class="px-10 py-4 bg-mbman-blue hover:bg-blue-900 text-white font-bold rounded-full transition transform hover:-translate-y-1 shadow-lg flex items-center border-2 border-white/20 hover:border-white/60">
+                    Apply for 2025 <i class="fas fa-arrow-right ml-3"></i>
+                </a>
+                <a href="#programs" class="text-white font-semibold hover:text-mbman-gold transition flex items-center group">
+                    Explore Programs <i class="fas fa-chevron-right ml-2 text-sm group-hover:translate-x-1 transition"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- SCROLLING MARQUEE BANNER -->
+    <div class="w-full z-20 bg-gray-900/95 backdrop-blur-sm text-gray-300 py-4 border-t border-white/10 flex-shrink-0">
+        <div class="container mx-auto px-4 flex items-center">
+            <div class="text-white font-bold pr-6 mr-6 border-r border-gray-700 uppercase tracking-wider text-sm shrink-0 flex items-center">
+                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-3"></span>
+                Latest Updates
+            </div>
+            <div class="marquee-container flex-1 text-sm font-medium">
+                <div class="marquee-content">
+                    {% for notice in marquee_notices %}
+                    <a href="{% url 'home:notice_detail' notice.pk %}" class="hover:text-white transition flex items-center">
+                        {% if notice.priority == 'urgent' %}
+                        <i class="fas fa-exclamation-triangle mr-2 text-red-500 opacity-80"></i>
+                        {% elif notice.priority == 'highlight' %}
+                        <span class="text-mbman-gold mr-2">[Important]</span>
+                        {% endif %}
+                        {{ notice.title }}
+                    </a>
+                    {% if not forloop.last %}<span class="text-gray-700 mx-4">|</span>{% endif %}
+                    {% empty %}
+                    <a href="{% url 'home:notices_page' %}" class="hover:text-white transition">Welcome to MBMAN School of Science & Technology</a>
+                    {% endfor %}
+                </div>
+                <div class="marquee-content" aria-hidden="true">
+                    {% for notice in marquee_notices %}
+                    <a href="{% url 'home:notice_detail' notice.pk %}" class="hover:text-white transition flex items-center">
+                        {% if notice.priority == 'urgent' %}
+                        <i class="fas fa-exclamation-triangle mr-2 text-red-500 opacity-80"></i>
+                        {% elif notice.priority == 'highlight' %}
+                        <span class="text-mbman-gold mr-2">[Important]</span>
+                        {% endif %}
+                        {{ notice.title }}
+                    </a>
+                    {% if not forloop.last %}<span class="text-gray-700 mx-4">|</span>{% endif %}
+                    {% empty %}
+                    <a href="#notices" class="hover:text-white transition">Welcome to MBMAN School of Science & Technology</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- QUICK NOTICES SECTION -->
+<section id="notices" class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row gap-12">
+            <!-- Section Intro -->
+            <div class="md:w-1/3">
+                <h4 class="text-mbman-gold font-bold uppercase tracking-wider mb-2">Stay Informed</h4>
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Notice Board & Events</h2>
+                <p class="text-gray-600 mb-8 leading-relaxed">
+                    Keep up with the latest announcements, examination schedules, and upcoming campus activities.
+                </p>
+                <div class="flex space-x-4">
+                    <button onclick="switchTab('notices')" id="btn-notices" class="flex-1 py-3 px-4 bg-mbman-blue text-white rounded-lg font-semibold shadow-md transition-all">
+                        Recent Notices
+                    </button>
+                    <button onclick="switchTab('events')" id="btn-events" class="flex-1 py-3 px-4 bg-gray-100 text-gray-600 rounded-lg font-semibold hover:bg-gray-200 transition-all">
+                        Upcoming Events
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="md:w-2/3 bg-gray-50 rounded-2xl p-6 md:p-8 border border-gray-100 shadow-inner min-h-[400px]">
+                <!-- NOTICES LIST -->
+                <div id="tab-notices" class="space-y-4 animate-fade-in">
+                    {% for notice in notices %}
+                    <a href="{% url 'home:notice_detail' notice.pk %}" class="block {% if notice.priority == 'urgent' %}bg-red-50{% else %}bg-white{% endif %} p-5 rounded-xl shadow-sm border-l-4 {% if notice.priority == 'urgent' %}border-red-500{% elif notice.priority == 'highlight' %}border-yellow-500{% else %}border-gray-300{% endif %} flex items-start hover:shadow-md transition">
+                        <div class="text-center mr-6 pr-6 border-r {% if notice.priority == 'urgent' %}border-red-100{% else %}border-gray-100{% endif %} min-w-[80px]">
+                            <span class="block text-sm font-bold {% if notice.priority == 'urgent' %}text-red-400{% else %}text-gray-400{% endif %} uppercase">{{ notice.date_bs|slice:":6" }}</span>
+                            <span class="block text-3xl font-extrabold {% if notice.priority == 'urgent' %}text-red-600{% elif notice.priority == 'highlight' %}text-yellow-600{% else %}text-gray-600{% endif %}">{{ notice.date_bs|slice:"7:9" }}</span>
+                            <span class="block text-xs {% if notice.priority == 'urgent' %}text-red-400{% else %}text-gray-400{% endif %}">{{ notice.date_bs|slice:"-4:" }}</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold {% if notice.priority == 'urgent' %}text-red-700{% else %}text-gray-800{% endif %} text-lg mb-2 hover:text-mbman-blue transition">{% if notice.priority == 'urgent' %}URGENT: {% endif %}{{ notice.title }}</h3>
+                            <p class="{% if notice.priority == 'urgent' %}text-red-600/80{% else %}text-gray-600{% endif %} text-sm line-clamp-2">{{ notice.description }}</p>
+                            {% if notice.file or notice.image %}
+                            <div class="inline-block mt-2 text-xs text-mbman-blue">
+                                {% if notice.file %}<i class="fas fa-file-pdf mr-1"></i>{% endif %}
+                                {% if notice.image %}<i class="fas fa-image mr-1"></i>{% endif %}
+                                View Details
+                            </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="bg-white p-8 rounded-xl shadow-sm text-center text-gray-500">
+                        <i class="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
+                        <p>No notices available at the moment.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- EVENTS LIST (Hidden by default) -->
+                <div id="tab-events" class="space-y-4 hidden animate-fade-in">
+                    {% for event in events %}
+                    <a href="{% url 'home:event_detail' event.pk %}" class="block bg-white p-5 rounded-xl shadow-sm border-l-4 {% if event.is_highlight %}border-mbman-gold{% else %}border-green-500{% endif %} flex items-start hover:shadow-md transition">
+                        <div class="text-center mr-6 pr-6 border-r border-gray-100 min-w-[80px]">
+                            <span class="block text-sm font-bold {% if event.is_highlight %}text-mbman-gold{% else %}text-green-600{% endif %} uppercase">{{ event.date_bs|slice:":6" }}</span>
+                            <span class="block text-3xl font-extrabold text-gray-800">{{ event.date_bs|slice:"7:9" }}</span>
+                        </div>
+                        <div class="flex-1">
+                            {% if event.is_highlight %}
+                            <span class="inline-block px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full mb-2">Highlight</span>
+                            {% endif %}
+                            <h3 class="font-bold text-gray-800 text-lg mb-1 hover:text-green-600 transition">{{ event.title }}</h3>
+                            <p class="text-gray-500 text-sm mb-3">
+                                <i class="far fa-clock mr-2"></i>{{ event.time|default:"TBA" }}
+                                {% if event.location %} @ {{ event.location }}{% endif %}
+                            </p>
+                            <p class="text-gray-600 text-sm line-clamp-2">{{ event.description }}</p>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="bg-white p-8 rounded-xl shadow-sm text-center text-gray-500">
+                        <i class="fas fa-calendar text-4xl text-gray-300 mb-3"></i>
+                        <p>No upcoming events at the moment.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ACADEMIC PROGRAMS SECTION -->
+<section id="programs" class="py-24 bg-mbman-light">
+    <div class="container mx-auto px-4">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h4 class="text-mbman-blue font-bold uppercase tracking-wider mb-3">Academic Excellence</h4>
+            <h2 class="text-4xl font-bold text-gray-900 mb-6">Undergraduate Programs</h2>
+            <p class="text-gray-600 text-lg">We offer specialized four-year degree programs designed to meet the demands of the modern workforce.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto">
+            {% for program in programs %}
+            {% with colors=program.get_color_classes %}
+            <!-- {{ program.code }} Program Card -->
+            <div class="group bg-white rounded-[2rem] overflow-hidden shadow-xl hover:shadow-2xl transition duration-500">
+                <div class="h-72 relative overflow-hidden">
+                    <div class="absolute inset-0 {{ colors.bg_light }} {{ colors.bg_hover }} transition z-10"></div>
+                    {% if program.image %}
+                    <img src="{{ program.image.url }}" alt="{{ program.code }} Students" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-700">
+                    {% else %}
+                    <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="{{ program.code }} Students" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-700">
+                    {% endif %}
+                    <div class="absolute bottom-6 left-6 z-20">
+                        <span class="px-4 py-2 {{ colors.bg }} text-white text-sm font-bold rounded-lg shadow-sm">{{ program.duration }}</span>
+                    </div>
+                </div>
+                <div class="p-10">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-3xl font-bold text-gray-900 mb-2">{{ program.code }}</h3>
+                            <p class="{{ colors.text }} font-medium">{{ program.full_name }}</p>
+                        </div>
+                        <i class="{{ program.icon_class }} {{ colors.icon_text }} text-5xl"></i>
+                    </div>
+                    <p class="text-gray-600 mb-8 leading-relaxed">
+                        {{ program.short_description }}
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        {% for feature in program.features.all %}
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="{{ feature.icon }} {{ colors.feature_icon }} mr-2"></i>{{ feature.feature_text }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'home:curriculum_page' program.url_slug %}" class="inline-flex items-center justify-center w-full py-4 bg-gray-50 {{ colors.text }} font-bold rounded-xl {{ colors.hover_bg }} hover:text-white transition duration-300">
+                        View {{ program.code }} Curriculum
+                    </a>
+                </div>
+            </div>
+            {% endwith %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- PRINCIPAL'S MESSAGE SECTION -->
+<section id="about" class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="bg-mbman-blue rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row">
+            <div class="lg:w-2/5 relative min-h-[300px] lg:min-h-full">
+                {% if principal_message and principal_message.photo %}
+                <img src="{{ principal_message.photo.url }}" alt="{{ principal_message.principal_name }}" class="absolute inset-0 w-full h-full object-cover object-top">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Principal" class="absolute inset-0 w-full h-full object-cover object-top">
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-mbman-blue via-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-mbman-blue opacity-80"></div>
+            </div>
+            <div class="lg:w-3/5 p-8 lg:p-16 text-white flex flex-col justify-center">
+                <i class="fas fa-quote-left text-5xl text-mbman-gold opacity-50 mb-6"></i>
+                {% if principal_message %}
+                <h2 class="text-3xl font-bold mb-6 leading-snug">"{{ principal_message.quote }}"</h2>
+                <p class="text-blue-100 text-lg mb-8 leading-relaxed">
+                    {{ principal_message.full_message }}
+                </p>
+                <div>
+                    <h4 class="text-xl font-bold text-white">{{ principal_message.principal_name }}</h4>
+                    <p class="text-mbman-gold font-medium">{{ principal_message.principal_title }}</p>
+                </div>
+                {% else %}
+                <h2 class="text-3xl font-bold mb-6 leading-snug">"Empowering the next generation of innovators for a prosperous Nepal."</h2>
+                <p class="text-blue-100 text-lg mb-8 leading-relaxed">
+                    At MBMAN School of Science & Technology, we believe in education that translates into action. Our curriculum is rigorously designed to bridge the gap between theoretical knowledge and real-world application, ensuring our graduates are not just degree holders, but problem solvers.
+                </p>
+                <div>
+                    <h4 class="text-xl font-bold text-white">Prof. Dr. Name Surname</h4>
+                    <p class="text-mbman-gold font-medium">Principal</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FACULTY SECTION -->
+<section id="faculty" class="py-24 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h4 class="text-mbman-blue font-bold uppercase tracking-wider mb-3">Our Mentors</h4>
+            <h2 class="text-4xl font-bold text-gray-900 mb-8">Meet Our Faculty</h2>
+            {% if faculty_tabs %}
+            <!-- Faculty Tab Buttons -->
+            <div class="inline-flex bg-white rounded-lg p-1 shadow-md border border-gray-100 flex-wrap justify-center">
+                {% for tab in faculty_tabs %}
+                <button onclick="switchFacultyTab('{{ tab.slug }}')" id="btn-faculty-{{ tab.slug }}" class="px-6 py-3 text-sm md:text-base font-bold rounded-md transition-all {% if forloop.first %}bg-mbman-blue text-white shadow-sm{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                    {{ tab.name }}
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        {% for tab in faculty_tabs %}
+        {% with colors=tab.get_color_classes %}
+        <!-- {{ tab.name }} Faculty Content -->
+        <div id="tab-faculty-{{ tab.slug }}" class="{% if not forloop.first %}hidden {% endif %}animate-fade-in">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for faculty in faculty_by_tab|dict_get:tab.slug %}
+                <a href="{% url 'home:faculty_detail' faculty.pk %}" class="block bg-white rounded-xl shadow-sm hover:shadow-xl transition duration-300 p-6 text-center group">
+                    <div class="w-32 h-32 mx-auto rounded-full overflow-hidden mb-6 border-4 {{ colors.border }} {{ colors.hover_border }} transition duration-300">
+                        {% if faculty.photo %}
+                        <img src="{{ faculty.photo.url }}" alt="{{ faculty.name }}" class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full bg-gray-300 flex items-center justify-center text-4xl font-bold text-gray-600">
+                            {{ faculty.name.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 mb-1 group-hover:{{ colors.text }} transition">{{ faculty.name }}</h4>
+                    <p class="{{ colors.text }} font-medium text-sm mb-3">{{ faculty.designation }}</p>
+                    {% if faculty.qualification %}
+                    <p class="text-gray-500 text-sm">{{ faculty.qualification }}</p>
+                    {% endif %}
+                </a>
+                {% empty %}
+                <div class="col-span-4 text-center py-12 text-gray-500">
+                    <i class="fas fa-users text-6xl text-gray-300 mb-4"></i>
+                    <p>No faculty members in {{ tab.name }} yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+    </div>
+</section>
+
+<!-- GRADUATE PROGRAMS SECTION (Conditional) -->
+{% if has_graduate_programs %}
+<section class="py-20 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+    <div class="container mx-auto px-4 text-center">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-4xl font-bold mb-6">We Also Offer Graduate Programs</h2>
+            <p class="text-lg text-purple-100 mb-8">
+                Advance your career with our Master's and Doctoral programs designed for working professionals and researchers.
+            </p>
+            <a href="#programs" class="inline-block px-8 py-4 bg-white text-purple-600 font-bold rounded-lg hover:bg-purple-50 transition shadow-lg">
+                <i class="fas fa-graduation-cap mr-2"></i>Explore Graduate Programs
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CONTACT SECTION -->
+<section id="contact" class="py-24 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <h4 class="text-mbman-blue font-bold uppercase tracking-wider mb-3">Get In Touch</h4>
+            <h2 class="text-4xl font-bold text-gray-900 mb-6">Contact Us</h2>
+            <p class="text-gray-600 text-lg">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            <!-- Contact Form -->
+            <div class="bg-gray-50 rounded-2xl p-8 lg:p-12">
+                <form method="post" action="{% url 'home:contact_submit' %}" class="space-y-6">
+                    {% csrf_token %}
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                        <input type="text" name="name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-mbman-blue focus:border-transparent" placeholder="Your name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                        <input type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-mbman-blue focus:border-transparent" placeholder="you@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+                        <input type="tel" name="phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-mbman-blue focus:border-transparent" placeholder="+977 98XXXXXXXX">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+                        <textarea name="message" required rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-mbman-blue focus:border-transparent" placeholder="Write your message here..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-4 bg-mbman-blue text-white font-bold rounded-lg hover:bg-blue-900 transition shadow-md">
+                        Send Message
+                    </button>
+                </form>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="space-y-8">
+                {% if contact_info %}
+                <div class="flex items-start space-x-5">
+                    <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-map-marker-alt text-mbman-blue text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-lg mb-2">Visit Us</h4>
+                        <p class="text-gray-600">{{ contact_info.address|linebreaksbr }}</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-5">
+                    <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-phone-alt text-mbman-blue text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-lg mb-2">Call Us</h4>
+                        <p class="text-gray-600">{{ contact_info.phone }}<br>Mon-Fri, 9:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-5">
+                    <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-envelope text-mbman-blue text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-lg mb-2">Email Us</h4>
+                        <p class="text-gray-600">{{ contact_info.email }}</p>
+                    </div>
+                </div>
+                <!-- Map -->
+                {% if contact_info.map_embed_url %}
+                <div class="rounded-2xl overflow-hidden shadow-lg h-64 bg-gray-200">
+                    <iframe src="{{ contact_info.map_embed_url }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="flex items-start space-x-5">
+                    <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-map-marker-alt text-mbman-blue text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-lg mb-2">Visit Us</h4>
+                        <p class="text-gray-600">Urlabari-3, Morang, Nepal<br>Eastern Region</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-5">
+                    <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-phone-alt text-mbman-blue text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-lg mb-2">Call Us</h4>
+                        <p class="text-gray-600">+977-021-540000<br>Mon-Fri, 9:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-5">
+                    <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-envelope text-mbman-blue text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-lg mb-2">Email Us</h4>
+                        <p class="text-gray-600">info@mbman.edu.np<br>admissions@mbman.edu.np</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Notice/Event Tab Switcher
+    function switchTab(tabName) {
+        const noticesTab = document.getElementById('tab-notices');
+        const eventsTab = document.getElementById('tab-events');
+        const btnNotices = document.getElementById('btn-notices');
+        const btnEvents = document.getElementById('btn-events');
+
+        if (tabName === 'notices') {
+            noticesTab.classList.remove('hidden');
+            eventsTab.classList.add('hidden');
+            btnNotices.classList.add('bg-mbman-blue', 'text-white', 'shadow-md');
+            btnNotices.classList.remove('bg-gray-100', 'text-gray-600');
+            btnEvents.classList.remove('bg-mbman-blue', 'text-white', 'shadow-md');
+            btnEvents.classList.add('bg-gray-100', 'text-gray-600');
+        } else {
+            noticesTab.classList.add('hidden');
+            eventsTab.classList.remove('hidden');
+            btnEvents.classList.add('bg-mbman-blue', 'text-white', 'shadow-md');
+            btnEvents.classList.remove('bg-gray-100', 'text-gray-600');
+            btnNotices.classList.remove('bg-mbman-blue', 'text-white', 'shadow-md');
+            btnNotices.classList.add('bg-gray-100', 'text-gray-600');
+        }
+    }
+
+    // Faculty Tab Switcher - Dynamic version
+    function switchFacultyTab(slug) {
+        // Hide all faculty tabs
+        const allTabs = document.querySelectorAll('[id^="tab-faculty-"]');
+        const allButtons = document.querySelectorAll('[id^="btn-faculty-"]');
+        
+        allTabs.forEach(tab => tab.classList.add('hidden'));
+        allButtons.forEach(btn => {
+            btn.classList.remove('bg-mbman-blue', 'text-white', 'shadow-sm');
+            btn.classList.add('text-gray-600', 'hover:bg-gray-100');
+        });
+        
+        // Show selected tab
+        const selectedTab = document.getElementById('tab-faculty-' + slug);
+        const selectedButton = document.getElementById('btn-faculty-' + slug);
+        
+        if (selectedTab) selectedTab.classList.remove('hidden');
+        if (selectedButton) {
+            selectedButton.classList.add('bg-mbman-blue', 'text-white', 'shadow-sm');
+            selectedButton.classList.remove('text-gray-600', 'hover:bg-gray-100');
+        }
+    }
+</script>
+{% endblock %}

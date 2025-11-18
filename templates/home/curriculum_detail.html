@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ program.full_name }} - Curriculum{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative h-[500px] overflow-hidden">
+    {% if curriculum.hero_image %}
+    <div class="absolute inset-0">
+        <img src="{{ curriculum.hero_image.url }}" alt="{{ program.full_name }}" class="w-full h-full object-cover">
+        <div class="absolute inset-0 {{ program.get_color_classes.bg_light }}"></div>
+    </div>
+    {% else %}
+    <div class="absolute inset-0 {{ program.get_color_classes.bg }}">
+        <div class="absolute inset-0 opacity-10" style="background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);"></div>
+    </div>
+    {% endif %}
+    
+    <div class="relative z-10 h-full flex items-center">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl">
+                <h1 class="text-5xl md:text-6xl font-bold text-white mb-4">{{ program.code }}</h1>
+                <p class="text-2xl text-white/90 mb-6">{{ program.full_name }}</p>
+                <div class="flex items-center space-x-6 text-white/80">
+                    <div class="flex items-center">
+                        <i class="fas fa-clock mr-2"></i>
+                        <span>{{ curriculum.duration|default:program.duration }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-book mr-2"></i>
+                        <span>{{ semesters|length }} Semesters</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Overview Section -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Program Overview</h2>
+            <p class="text-gray-700 text-lg leading-relaxed">
+                {{ curriculum.overview_text|default:program.full_description }}
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Curriculum Section -->
+<section class="py-16">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center text-gray-900 mb-12">Curriculum Structure</h2>
+        
+        {% if semesters %}
+        <!-- Semester Tabs -->
+        <div class="max-w-6xl mx-auto">
+            <div class="flex overflow-x-auto space-x-2 mb-8 pb-2 scrollbar-hide">
+                {% for semester in semesters %}
+                <button onclick="switchTab('semester-{{ semester.semester_number }}')" 
+                        id="tab-semester-{{ semester.semester_number }}"
+                        class="semester-tab px-6 py-3 rounded-lg font-semibold whitespace-nowrap transition {% if forloop.first %}{{ program.get_color_classes.bg }} text-white{% else %}bg-gray-200 text-gray-700 hover:bg-gray-300{% endif %}">
+                    Semester {{ semester.semester_number }}
+                </button>
+                {% endfor %}
+            </div>
+
+            <!-- Semester Content -->
+            {% for semester in semesters %}
+            <div id="content-semester-{{ semester.semester_number }}" 
+                 class="semester-content {% if not forloop.first %}hidden{% endif %} animate-fade-in">
+                
+                {% if semester.description %}
+                <p class="text-gray-600 mb-6 text-center">{{ semester.description }}</p>
+                {% endif %}
+
+                {% if semester.courses.all %}
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <table class="w-full">
+                        <thead class="{{ program.get_color_classes.bg }} text-white">
+                            <tr>
+                                <th class="px-6 py-4 text-left font-semibold">Course Code</th>
+                                <th class="px-6 py-4 text-left font-semibold">Course Title</th>
+                                <th class="px-6 py-4 text-center font-semibold">Credits</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for course in semester.courses.all %}
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4 font-mono text-sm {{ program.get_color_classes.text }}">{{ course.code }}</td>
+                                <td class="px-6 py-4">{{ course.title }}</td>
+                                <td class="px-6 py-4 text-center font-semibold">{{ course.credits }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-book-open text-4xl mb-3"></i>
+                    <p>No courses available for this semester yet.</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12 text-gray-500">
+            <i class="fas fa-graduation-cap text-6xl mb-4"></i>
+            <p class="text-xl">Curriculum details coming soon.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Career Prospects Section -->
+{% if career_prospects %}
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center text-gray-900 mb-12">Career Prospects</h2>
+        <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+            {% for prospect in career_prospects %}
+            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
+                <div class="flex items-start">
+                    <div class="{{ program.get_color_classes.bg }} text-white w-12 h-12 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                        <i class="{{ prospect.icon }} text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">{{ prospect.title }}</h3>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<script>
+function switchTab(semesterId) {
+    // Hide all content
+    document.querySelectorAll('.semester-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    // Reset all tabs
+    document.querySelectorAll('.semester-tab').forEach(tab => {
+        tab.classList.remove('{{ program.get_color_classes.bg }}', 'text-white');
+        tab.classList.add('bg-gray-200', 'text-gray-700');
+    });
+    
+    // Show selected content
+    document.getElementById('content-' + semesterId).classList.remove('hidden');
+    
+    // Highlight selected tab
+    const selectedTab = document.getElementById('tab-' + semesterId);
+    selectedTab.classList.remove('bg-gray-200', 'text-gray-700');
+    selectedTab.classList.add('{{ program.get_color_classes.bg }}', 'text-white');
+}
+</script>
+
+<style>
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+</style>
+{% endblock %}

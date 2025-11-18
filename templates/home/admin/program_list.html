@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Programs - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-900">Manage Programs</h2>
+            <p class="text-gray-600 mt-2">Add, edit, and manage programs and their features</p>
+        </div>
+        <a href="{% url 'home:program_add' %}" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold shadow-md">
+            <i class="fas fa-plus mr-2"></i>Add New Program
+        </a>
+    </div>
+
+    {% if programs %}
+        {% for program in programs %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-900">{{ program.code }} - {{ program.full_name }}</h3>
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-full text-sm font-semibold {% if program.is_active %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {% if program.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                    <a href="{% url 'home:program_edit' program.pk %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm">
+                        <i class="fas fa-edit mr-1"></i>Edit Details
+                    </a>
+                    <form method="post" action="{% url 'home:program_delete' program.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{ program.code }}? This will also delete all associated curricula, semesters, courses, and features.')">
+                        {% csrf_token %}
+                        <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-sm">
+                            <i class="fas fa-trash mr-1"></i>Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div>
+                        {% if program.image %}
+                        <img src="{{ program.image.url }}" alt="{{ program.code }}" class="w-full rounded-lg shadow-sm">
+                        {% else %}
+                        <div class="bg-gray-100 p-8 text-center rounded-lg">
+                            <i class="fas fa-image text-6xl text-gray-400"></i>
+                            <p class="text-gray-500 mt-3">No image</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="md:col-span-2 space-y-3">
+                        <div>
+                            <span class="text-sm font-semibold text-gray-500 uppercase">Duration</span>
+                            <p class="text-gray-800 mt-1">{{ program.duration }}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-gray-500 uppercase">Short Description</span>
+                            <p class="text-gray-800 mt-1">{{ program.short_description|truncatewords:30 }}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-gray-500 uppercase">Full Description</span>
+                            <p class="text-gray-800 mt-1">{{ program.full_description|truncatewords:50 }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 border-t border-gray-200 pt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-lg font-bold text-gray-900">Program Features <span class="text-gray-500 text-sm font-normal">({{ program.features.count }})</span></h4>
+                        <a href="{% url 'home:program_feature_add' program.pk %}" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold text-sm">
+                            <i class="fas fa-plus mr-1"></i>Add Feature
+                        </a>
+                    </div>
+
+                    {% if program.features.all %}
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Icon</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Feature Text</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    {% for feature in program.features.all %}
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 whitespace-nowrap"><i class="{{ feature.icon }} text-blue-600 text-lg"></i></td>
+                                        <td class="px-4 py-3">{{ feature.feature_text }}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-gray-600">{{ feature.display_order }}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <a href="{% url 'home:program_feature_edit' feature.pk %}" class="text-blue-600 hover:text-blue-800 font-medium mr-3">
+                                                <i class="fas fa-edit mr-1"></i>Edit
+                                            </a>
+                                            <form method="post" action="{% url 'home:program_feature_delete' feature.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this feature?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="text-red-600 hover:text-red-800 font-medium">
+                                                    <i class="fas fa-trash mr-1"></i>Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500 italic">No features added yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div class="flex items-start">
+                <i class="fas fa-info-circle text-blue-600 text-xl mr-3 mt-1"></i>
+                <div>
+                    <h4 class="font-semibold text-blue-900 mb-1">No Programs Found</h4>
+                    <p class="text-blue-800">Programs should be created through Django admin at <a href="/django-admin/" class="underline font-semibold">/django-admin/</a></p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <a href="{% url 'home:admin_dashboard' %}" class="inline-flex items-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold mt-6">
+        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+    </a>
+</div>
+</div>
+{% endblock %}

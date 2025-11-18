@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-gradient-to-r from-amber-50 to-amber-100 px-6 py-4 border-b border-amber-200">
+            <h2 class="text-2xl font-bold text-gray-900">{{ title }}</h2>
+        </div>
+
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.program.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">Program</label>
+                {{ form.program }}
+                {% if form.program.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.program.errors }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.feature_text.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">Feature Text</label>
+                {{ form.feature_text }}
+                {% if form.feature_text.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.feature_text.errors }}</p>
+                {% endif %}
+                <p class="text-gray-500 text-sm mt-1">e.g., "Modern IT Labs", "Industry Tie-ups", etc.</p>
+            </div>
+
+            <div>
+                <label for="{{ form.icon.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">Icon Class</label>
+                {{ form.icon }}
+                {% if form.icon.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.icon.errors }}</p>
+                {% endif %}
+                <p class="text-gray-500 text-sm mt-1">Font Awesome icon class (e.g., "fas fa-check-circle")</p>
+            </div>
+
+            <div>
+                <label for="{{ form.display_order.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">Display Order</label>
+                {{ form.display_order }}
+                {% if form.display_order.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.display_order.errors }}</p>
+                {% endif %}
+                <p class="text-gray-500 text-sm mt-1">Lower numbers appear first</p>
+            </div>
+
+            <div class="flex gap-3 pt-4 border-t border-gray-200">
+                <button type="submit" class="px-6 py-2.5 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition font-semibold">
+                    <i class="fas fa-save mr-2"></i>Save Feature
+                </button>
+                <a href="{% url 'home:program_list' %}" class="px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-semibold">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

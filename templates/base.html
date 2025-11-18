@@ -4,7 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School of Science and Technology - MBMAN</title>
+    <title>{% block title %}{{ site_config.college_name|default:"School of Science and Technology" }} - MBMAN{% endblock %}</title>
+    {% if site_logo and site_logo.logo %}
+    <link rel="icon" type="image/x-icon" href="{{ site_logo.logo.url }}">
+    <link rel="apple-touch-icon" href="{{ site_logo.logo.url }}">
+    {% endif %}
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -12,8 +16,8 @@
                 extend: {
                     colors: {
                         mbman: {
-                            blue: '#06437a', // NEW Primary Brand Color
-                            gold: '#d97706', // Accent gold/amber
+                            blue: '#06437a',
+                            gold: '#d97706',
                             light: '#f3f4f6',
                         }
                     },
@@ -24,25 +28,291 @@
             }
         }
     </script>
-    <!-- Google Fonts: Inter for clean, modern typography -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    </head>
-<body class="bg-gray-50 text-gray-800 antialiased">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        {% block inline_styles %}{% endblock %}
+    </style>
+</head>
+<body class="{% block body_class %}bg-gray-50 text-gray-800 antialiased{% endblock %}">
+
     <!-- TOP BAR (Contact Info) -->
-    {% include 'components/topbar.html' %}
-    {% include 'components/navbar.html' %}
-    <!-- MAIN CONTENT -->
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+    <div class="bg-white text-gray-600 py-2 text-xs md:text-sm border-b">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <span><i class="fas fa-phone-alt mr-2 text-mbman-blue"></i>{{ contact_info.phone|default:"+977-021-540000" }}</span>
+                <span class="hidden md:inline"><i class="fas fa-envelope mr-2 text-mbman-blue"></i>{{ contact_info.email|default:"info@mbman.edu.np" }}</span>
+            </div>
+            <div class="flex items-center space-x-4 opacity-80">
+                {% if contact_info.facebook_url %}<a href="{{ contact_info.facebook_url }}" target="_blank" class="hover:text-mbman-blue transition"><i class="fab fa-facebook-f"></i></a>{% endif %}
+                {% if contact_info.twitter_url %}<a href="{{ contact_info.twitter_url }}" target="_blank" class="hover:text-mbman-blue transition"><i class="fab fa-twitter"></i></a>{% endif %}
+                {% if contact_info.linkedin_url %}<a href="{{ contact_info.linkedin_url }}" target="_blank" class="hover:text-mbman-blue transition"><i class="fab fa-linkedin-in"></i></a>{% endif %}
+                {% if contact_info.youtube_url %}<a href="{{ contact_info.youtube_url }}" target="_blank" class="hover:text-mbman-blue transition"><i class="fab fa-youtube"></i></a>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Logo Area -->
+            <a href="{% url 'home:index' %}" class="flex items-center space-x-3 group">
+                {% if site_logo and site_logo.logo %}
+                <img src="{{ site_logo.logo.url }}" alt="Logo" class="h-12 w-12 object-contain">
+                {% else %}
+                <div class="h-12 w-12 bg-mbman-blue rounded-xl rotate-3 group-hover:rotate-0 transition duration-300 flex items-center justify-center text-white font-bold text-2xl shadow-md">
+                    M
+                </div>
+                {% endif %}
+                <div class="leading-tight">
+                    <h1 class="text-mbman-blue font-extrabold text-xl tracking-tight">{{ site_logo.logo_text|default:"School of Science & Technology" }}</h1>
+                    <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">{{ site_logo.logo_subtext|default:"Madan Bhandari Memorial Academy Nepal" }}</p>
+                </div>
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden lg:flex items-center">
+                <div class="flex items-center space-x-8 font-medium text-gray-700 text-[15px]">
+                    <a href="{% url 'home:index' %}" class="hover:text-mbman-blue transition">Home</a>
+                    <a href="{% url 'home:index' %}#programs" class="hover:text-mbman-blue transition">Programs</a>
+                    <a href="{% url 'home:index' %}#notices" class="hover:text-mbman-blue transition">Notices</a>
+                    <a href="{% url 'home:index' %}#faculty" class="hover:text-mbman-blue transition">Faculty</a>
+                    <a href="{% url 'home:about' %}" class="hover:text-mbman-blue transition">About</a>
+                    <a href="{% url 'home:index' %}#contact" class="hover:text-mbman-blue transition">Contact</a>
+                </div>
+
+                <!-- User/Login Section -->
+                <div class="flex items-center space-x-5 ml-8 border-l border-gray-200 pl-8">
+                    {% if user.is_authenticated %}
+                    <!-- User Dropdown -->
+                    <div class="relative" id="user-dropdown-container">
+                        <button id="user-dropdown-btn" class="text-gray-600 text-sm font-medium flex items-center hover:text-mbman-blue transition focus:outline-none">
+                            <i class="far fa-user-circle mr-2 text-mbman-blue text-lg"></i>
+                            Welcome, {{ user.username }}
+                            <i class="fas fa-chevron-down text-xs ml-2 transition-transform"></i>
+                        </button>
+                        <div id="user-dropdown-menu" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-xl z-50 border border-gray-100 py-1 overflow-hidden">
+                            <a href="{% url 'home:manage_account' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-mbman-blue transition">Manage Account</a>
+                            {% if user.is_staff %}
+                            <a href="{% url 'home:admin_dashboard' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-mbman-blue transition">Dashboard</a>
+                            {% endif %}
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="{% url 'auth:logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition">Logout</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Login Button -->
+                    <div id="login-section-desktop">
+                        <a href="{% url 'auth:login' %}" class="px-5 py-2 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition shadow-sm font-semibold text-sm">
+                            Login
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="lg:hidden text-gray-700 focus:outline-none p-2">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t pb-4 px-4 shadow-lg">
+            <a href="{% url 'home:index' %}" class="block py-3 border-b text-gray-700">Home</a>
+            <a href="{% url 'home:index' %}#programs" class="block py-3 border-b text-gray-700">Programs</a>
+            <a href="{% url 'home:index' %}#notices" class="block py-3 border-b text-gray-700">Notices</a>
+            <a href="{% url 'home:index' %}#faculty" class="block py-3 border-b text-gray-700">Faculty</a>
+            <a href="{% url 'home:index' %}#about" class="block py-3 border-b text-gray-700">About Us</a>
+            <a href="{% url 'home:index' %}#contact" class="block py-3 border-b text-gray-700">Contact Us</a>
+
+            <!-- Mobile User/Login -->
+            <div class="mt-6 pt-6 border-t border-gray-100">
+                {% if user.is_authenticated %}
+                <div id="user-section-mobile">
+                    <div class="flex items-center mb-4 px-1">
+                        <i class="far fa-user-circle mr-3 text-mbman-blue text-xl"></i>
+                        <span class="text-gray-700 font-medium">Welcome, {{ user.username }}</span>
+                    </div>
+                    <div class="flex flex-col space-y-2 mt-4">
+                        <a href="{% url 'home:manage_account' %}" class="block w-full text-left px-5 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition font-medium">
+                            Manage Account
+                        </a>
+                        {% if user.is_staff %}
+                        <a href="{% url 'home:admin_dashboard' %}" class="block w-full text-left px-5 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition font-medium">
+                            Dashboard
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'auth:logout' %}" class="block w-full text-center px-5 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-sm font-semibold mt-2">
+                            Logout
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div id="login-section-mobile" class="mt-4">
+                    <a href="{% url 'auth:login' %}" class="block w-full text-center px-5 py-3 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition shadow-sm font-semibold">
+                        Student / Staff Login
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages Display -->
+    {% if messages %}
+    <div class="fixed top-20 right-4 z-50 space-y-2">
+        {% for message in messages %}
+        <div class="alert-message bg-white shadow-lg rounded-lg px-6 py-4 border-l-4 {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500{% elif message.tags == 'warning' %}border-yellow-500{% else %}border-blue-500{% endif %} max-w-md animate-fade-in">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    {% if message.tags == 'success' %}
+                    <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                    {% elif message.tags == 'error' %}
+                    <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                    {% elif message.tags == 'warning' %}
+                    <i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
+                    {% else %}
+                    <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                    {% endif %}
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium text-gray-900">{{ message }}</p>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600 transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        // Auto-dismiss messages after 5 seconds
+        setTimeout(() => {
+            document.querySelectorAll('.alert-message').forEach(msg => {
+                msg.style.opacity = '0';
+                msg.style.transform = 'translateX(100%)';
+                msg.style.transition = 'all 0.3s ease-out';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 5000);
+    </script>
+    {% endif %}
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
     <!-- FOOTER -->
-    {% include 'components/footer.html' %}
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- About Column -->
+                <div>
+                    <h3 class="text-white font-bold text-lg mb-4">School of Science & Technology</h3>
+                    <p class="text-sm leading-relaxed mb-4">
+                        Eastern Nepal's premier institute for BIT and Agriculture programs. Empowering the next generation of tech and agro leaders.
+                    </p>
+                    <div class="flex space-x-3">
+                        {% if site_config.facebook_url %}<a href="{{ site_config.facebook_url }}" target="_blank" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-mbman-blue transition"><i class="fab fa-facebook-f"></i></a>{% endif %}
+                        {% if site_config.twitter_url %}<a href="{{ site_config.twitter_url }}" target="_blank" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-mbman-blue transition"><i class="fab fa-twitter"></i></a>{% endif %}
+                        {% if site_config.instagram_url %}<a href="{{ site_config.instagram_url }}" target="_blank" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-mbman-blue transition"><i class="fab fa-instagram"></i></a>{% endif %}
+                        {% if site_config.linkedin_url %}<a href="{{ site_config.linkedin_url }}" target="_blank" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-mbman-blue transition"><i class="fab fa-linkedin-in"></i></a>{% endif %}
+                        {% if site_config.youtube_url %}<a href="{{ site_config.youtube_url }}" target="_blank" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-mbman-blue transition"><i class="fab fa-youtube"></i></a>{% endif %}
+                    </div>
+                </div>
 
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{% url 'home:about' %}" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="{% url 'home:index' %}#programs" class="hover:text-white transition">Our Programs</a></li>
+                        <li><a href="{% url 'home:index' %}#faculty" class="hover:text-white transition">Faculty</a></li>
+                        <li><a href="{% url 'home:notices_page' %}" class="hover:text-white transition">Notices</a></li>
+                        <li><a href="{% url 'home:events_page' %}" class="hover:text-white transition">Events</a></li>
+                    </ul>
+                </div>
 
+                <!-- Programs -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Programs</h4>
+                    <ul class="space-y-2 text-sm">
+                        {% if all_programs %}
+                            {% for program in all_programs %}
+                                <li>
+                                    <a href="{% url 'home:curriculum_page' program.url_slug %}" class="hover:text-white transition">
+                                        {{ program.code }} - {{ program.full_name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="text-gray-500 italic">No programs available</li>
+                        {% endif %}
+                    </ul>
+                </div>
 
-   
+                <!-- Contact -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Contact Us</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mr-3 mt-1 text-mbman-blue"></i>
+                            <span>{{ contact_info.address|default:"Urlabari-3, Morang, Nepal" }}</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone-alt mr-3 text-mbman-blue"></i>
+                            <span>{{ contact_info.phone|default:"+977-021-540000" }}</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-3 text-mbman-blue"></i>
+                            <span>{{ contact_info.email|default:"info@mbman.edu.np" }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
+            <!-- Bottom Bar -->
+            <div class="border-t border-gray-800 pt-6 text-center text-sm">
+                <p>&copy; {% now "Y" %} {{ site_config.college_name|default:"School of Science and Technology, MBMAN" }}. {{ site_config.footer_text|default:"All rights reserved." }}</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/base.js' %}"></script>
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // User Dropdown Toggle
+        const userDropdownBtn = document.getElementById('user-dropdown-btn');
+        const userDropdownMenu = document.getElementById('user-dropdown-menu');
+        const userDropdownContainer = document.getElementById('user-dropdown-container');
+
+        if (userDropdownBtn) {
+            userDropdownBtn.addEventListener('click', () => {
+                userDropdownMenu.classList.toggle('hidden');
+            });
+
+            window.addEventListener('click', (e) => {
+                if (userDropdownContainer && !userDropdownContainer.contains(e.target)) {
+                    if (userDropdownMenu) {
+                        userDropdownMenu.classList.add('hidden');
+                    }
+                }
+            });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

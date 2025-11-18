@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}403 - Access Forbidden{% endblock %}
+
+{% block content %}
+<section class="py-24 bg-gray-50 min-h-screen flex items-center">
+    <div class="container mx-auto px-4">
+        <div class="max-w-2xl mx-auto text-center">
+            <div class="mb-8">
+                <i class="fas fa-ban text-red-500 text-8xl mb-6 opacity-50"></i>
+            </div>
+            <h1 class="text-9xl font-extrabold text-red-500 mb-4">403</h1>
+            <h2 class="text-4xl font-bold text-gray-900 mb-6">Access Forbidden</h2>
+            <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                You don't have permission to access this resource. Please contact the administrator if you believe this is an error.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'home:index' %}" class="px-8 py-4 bg-mbman-blue text-white rounded-lg hover:bg-blue-900 transition shadow-lg font-semibold text-lg">
+                    <i class="fas fa-home mr-2"></i>Back to Home
+                </a>
+                <a href="javascript:history.back()" class="px-8 py-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition shadow-lg font-semibold text-lg">
+                    <i class="fas fa-arrow-left mr-2"></i>Go Back
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
