@@ -552,7 +552,9 @@ def hero_edit(request):
         if form.is_valid():
             # Deactivate all other hero sections
             HeroSection.objects.all().update(is_active=False)
-            form.save()
+            hero_instance = form.save(commit=False)
+            hero_instance.is_active = True
+            hero_instance.save()
             messages.success(request, "Hero section updated successfully!")
             return redirect("home:page_content")
     else:

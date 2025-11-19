@@ -234,12 +234,15 @@ class HeroSectionForm(forms.ModelForm):
             "display_order",
             "is_active",
         ]
+        help_texts = {
+            'title': 'Use &lt;span class="text-transparent bg-clip-text bg-gradient-to-r from-mbman-gold to-yellow-300"&gt;Technology&lt;/span&gt; to colorize words.',
+        }
         widgets = {
-            "title": forms.TextInput(
-                attrs={"class": "form-input", "placeholder": "Hero section title"}
+            "title": forms.Textarea(
+                attrs={"class": "form-input", "rows": 3, "placeholder": "Hero section title"}
             ),
-            "subtitle": forms.TextInput(
-                attrs={"class": "form-input", "placeholder": "Hero section subtitle"}
+            "subtitle": forms.Textarea(
+                attrs={"class": "form-input", "rows": 3, "placeholder": "Hero section subtitle"}
             ),
             "background_image": forms.FileInput(attrs={"class": "form-input"}),
             "background_overlay": forms.Select(attrs={"class": "form-input"}),
