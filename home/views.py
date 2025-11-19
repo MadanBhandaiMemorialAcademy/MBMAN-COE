@@ -8,6 +8,7 @@ from .forms import (
     ContactInfoForm,
     EventForm,
     FacultyForm,
+    FooterLinkForm,
     HeroSectionForm,
     MarqueeItemForm,
     NoticeForm,
@@ -23,6 +24,7 @@ from .models import (
     CurriculumSemester,
     Event,
     Faculty,
+    FooterLink,
     HeroSection,
     MarqueeItem,
     Notice,
@@ -552,7 +554,9 @@ def hero_edit(request):
         if form.is_valid():
             # Deactivate all other hero sections
             HeroSection.objects.all().update(is_active=False)
-            form.save()
+            hero_instance = form.save(commit=False)
+            hero_instance.is_active = True
+            hero_instance.save()
             messages.success(request, "Hero section updated successfully!")
             return redirect("home:page_content")
     else:
@@ -1080,6 +1084,68 @@ def site_configuration_edit(request):
         "home/admin/site_config_form.html",
         {"form": form, "title": "Edit Site Configuration"},
     )
+
+
+# ============= FOOTER LINK MANAGEMENT =============
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def footer_link_list(request):
+    """List all footer links"""
+    links = FooterLink.objects.all().order_by("display_order")
+    return render(request, "home/admin/footer_link_list.html", {"links": links})
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def footer_link_add(request):
+    """Add new footer link"""
+    if request.method == "POST":
+        form = FooterLinkForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Footer link created successfully!")
+            return redirect("home:footer_link_list")
+    else:
+        form = FooterLinkForm()
+
+    return render(
+        request, "home/admin/footer_link_form.html", {"form": form, "title": "Add Footer Link"}
+    )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def footer_link_edit(request, pk):
+    """Edit existing footer link"""
+    link = get_object_or_404(FooterLink, pk=pk)
+
+    if request.method == "POST":
+        form = FooterLinkForm(request.POST, instance=link)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Footer link updated successfully!")
+            return redirect("home:footer_link_list")
+    else:
+        form = FooterLinkForm(instance=link)
+
+    return render(
+        request,
+        "home/admin/footer_link_form.html",
+        {"form": form, "title": "Edit Footer Link", "link": link},
+    )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def footer_link_delete(request, pk):
+    """Delete footer link"""
+    link = get_object_or_404(FooterLink, pk=pk)
+    link.delete()
+    messages.success(request, "Footer link deleted successfully!")
+    return redirect("home:footer_link_list")
 
 
 # Image Slideshow Views

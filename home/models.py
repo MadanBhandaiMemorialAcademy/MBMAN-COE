@@ -652,6 +652,22 @@ class SiteConfiguration(models.Model):
         super().save(*args, **kwargs)
 
 
+class FooterLink(models.Model):
+    """Model for footer links"""
+
+    name = models.CharField(max_length=100)
+    url = models.CharField(max_length=200)
+    display_order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order"]
+        verbose_name = "Footer Link"
+        verbose_name_plural = "Footer Links"
+
+    def __str__(self):
+        return self.name
+		
+
 class ImageSlideshow(models.Model):
     """Model for image slideshows that can be displayed on various pages"""
 

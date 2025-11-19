@@ -11,6 +11,7 @@ from .models import (
     Event,
     Faculty,
     FacultyTab,
+    FooterLink,
     HeroSection,
     ImageSlideshow,
     MarqueeItem,
@@ -234,12 +235,15 @@ class HeroSectionForm(forms.ModelForm):
             "display_order",
             "is_active",
         ]
+        help_texts = {
+            'title': 'Use &lt;span class="text-transparent bg-clip-text bg-gradient-to-r from-mbman-gold to-yellow-300"&gt;Technology&lt;/span&gt; to colorize words.',
+        }
         widgets = {
-            "title": forms.TextInput(
-                attrs={"class": "form-input", "placeholder": "Hero section title"}
+            "title": forms.Textarea(
+                attrs={"class": "form-input", "rows": 3, "placeholder": "Hero section title"}
             ),
-            "subtitle": forms.TextInput(
-                attrs={"class": "form-input", "placeholder": "Hero section subtitle"}
+            "subtitle": forms.Textarea(
+                attrs={"class": "form-input", "rows": 3, "placeholder": "Hero section subtitle"}
             ),
             "background_image": forms.FileInput(attrs={"class": "form-input"}),
             "background_overlay": forms.Select(attrs={"class": "form-input"}),
@@ -635,6 +639,23 @@ class SiteConfigurationForm(forms.ModelForm):
             "meta_description": forms.Textarea(attrs={"class": "form-input", "rows": 3}),
             "meta_keywords": forms.Textarea(attrs={"class": "form-input", "rows": 2}),
             "is_active": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
+        }
+
+
+class FooterLinkForm(forms.ModelForm):
+    class Meta:
+        model = FooterLink
+        fields = ["name", "url", "display_order"]
+        widgets = {
+            "name": forms.TextInput(
+                attrs={"class": "form-input", "placeholder": "Link name"}
+            ),
+            "url": forms.TextInput(
+                attrs={"class": "form-input", "placeholder": "URL"}
+            ),
+            "display_order": forms.NumberInput(
+                attrs={"class": "form-input", "placeholder": "Display order"}
+            ),
         }
 
 

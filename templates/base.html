@@ -211,9 +211,9 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <!-- About Column -->
                 <div>
-                    <h3 class="text-white font-bold text-lg mb-4">College of Engineering</h3>
+                    <h3 class="text-white font-bold text-lg mb-4">{{ site_config.college_name|default:"College of Engineering" }}</h3>
                     <p class="text-sm leading-relaxed mb-4">
-                        Joint constituent campus of Madan Bhandari Memorial Academy Nepal (MBMAN) and Pokhara University (PU), offering quality engineering education and fostering innovation.
+                        {{ site_config.footer_about|default:"Joint constituent campus of Madan Bhandari Memorial Academy Nepal (MBMAN) and Pokhara University (PU), offering quality engineering education and fostering innovation." }}
                     </p>
                     <div class="flex space-x-3">
                         {% if site_config.facebook_url %}<a href="{{ site_config.facebook_url }}" target="_blank" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-mbman-blue transition"><i class="fab fa-facebook-f"></i></a>{% endif %}
@@ -228,11 +228,9 @@
                 <div>
                     <h4 class="text-white font-semibold mb-4">Quick Links</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'home:about' %}" class="hover:text-white transition">About Us</a></li>
-                        <li><a href="{% url 'home:index' %}#programs" class="hover:text-white transition">Our Programs</a></li>
-                        <li><a href="{% url 'home:index' %}#faculty" class="hover:text-white transition">Faculty</a></li>
-                        <li><a href="{% url 'home:notices_page' %}" class="hover:text-white transition">Notices</a></li>
-                        <li><a href="{% url 'home:events_page' %}" class="hover:text-white transition">Events</a></li>
+                        {% for link in footer_links %}
+                        <li><a href="{{ link.url }}" class="hover:text-white transition">{{ link.name }}</a></li>
+                        {% endfor %}
                     </ul>
                 </div>
 
