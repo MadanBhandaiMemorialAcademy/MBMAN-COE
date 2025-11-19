@@ -58,14 +58,16 @@ def index(request):
         )
 
     # Check for graduate programs (programs with "graduate" or "master" in name)
-    has_graduate_programs = Program.objects.filter(
-        is_active=True
-    ).filter(
-        models.Q(full_name__icontains="master")
-        | models.Q(full_name__icontains="graduate")
-        | models.Q(full_name__icontains="phd")
-        | models.Q(full_name__icontains="doctoral")
-    ).exists()
+    has_graduate_programs = (
+        Program.objects.filter(is_active=True)
+        .filter(
+            models.Q(full_name__icontains="master")
+            | models.Q(full_name__icontains="graduate")
+            | models.Q(full_name__icontains="phd")
+            | models.Q(full_name__icontains="doctoral")
+        )
+        .exists()
+    )
 
     context = {
         "site_config": SiteConfiguration.objects.filter(is_active=True).first(),
