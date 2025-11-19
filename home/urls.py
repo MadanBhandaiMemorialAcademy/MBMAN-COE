@@ -11,7 +11,6 @@ urlpatterns = [
     path("programs/agriculture/", views.agriculture, name="agriculture"),
     path("faculty/<int:pk>/", views.faculty_detail, name="faculty_detail"),
     path("account/manage/", views.manage_account, name="manage_account"),
-    path("contact/submit/", views.contact_submit, name="contact_submit"),
     # Public Notice Pages
     path("notices/", views.notices_page, name="notices_page"),
     path("notices/<int:pk>/", views.notice_detail, name="notice_detail"),

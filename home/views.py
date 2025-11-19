@@ -89,27 +89,6 @@ def index(request):
     return render(request, "home/index.html", context)
 
 
-def contact_submit(request):
-    """Handle contact form submission"""
-    if request.method == "POST":
-        name = request.POST.get("name")
-        email = request.POST.get("email")
-        phone = request.POST.get("phone")
-        message = request.POST.get("message")
-
-        if name and email and phone and message:
-            ContactMessage.objects.create(
-                name=name, email=email, phone=phone, message=message
-            )
-            messages.success(
-                request, "Thank you for your message! We will get back to you soon."
-            )
-        else:
-            messages.error(request, "Please fill in all fields.")
-
-    return redirect("home:index")
-
-
 def curriculum_page(request, slug):
     """Dynamic curriculum page for any program"""
     # Get program by URL slug
