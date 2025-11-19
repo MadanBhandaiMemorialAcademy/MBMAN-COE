@@ -60,6 +60,19 @@ urlpatterns = [
         name="principal_message_edit",
     ),
     path("admin/contact-info/edit/", views.contact_info_edit, name="contact_info_edit"),
+    # Footer Link Management
+    path("admin/footer-links/", views.footer_link_list, name="footer_link_list"),
+    path("admin/footer-links/add/", views.footer_link_add, name="footer_link_add"),
+    path(
+        "admin/footer-links/<int:pk>/edit/",
+        views.footer_link_edit,
+        name="footer_link_edit",
+    ),
+    path(
+        "admin/footer-links/<int:pk>/delete/",
+        views.footer_link_delete,
+        name="footer_link_delete",
+    ),
     # Curriculum Management
     path("admin/curriculum/", views.curriculum_list, name="curriculum_list"),
     path("admin/curriculum/add/", views.curriculum_add, name="curriculum_add"),

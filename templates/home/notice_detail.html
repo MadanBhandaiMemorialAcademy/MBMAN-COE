@@ -67,10 +67,15 @@
                         </h3>
                         {% if notice.file.url|slice:"-4:" == ".pdf" or notice.file.url|slice:"-4:" == ".PDF" %}
                         <div class="mb-4">
-                            <embed src="{{ notice.file.url }}#view=FitH" 
-                                   type="application/pdf"
-                                   class="w-full h-[600px] border border-gray-300 rounded-lg" 
-                                   title="Notice Document">
+                            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+                                <p class="font-bold">Preview not available</p>
+                                <p>The PDF preview is not available on the local server. Please use the link below to open the PDF in a new tab.</p>
+                            </div>
+                            <a href="{{ notice.file.url }}" target="_blank"
+                               class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                                <i class="far fa-file-pdf mr-2"></i>
+                                Open Document in New Tab
+                            </a>
                         </div>
                         {% endif %}
                         <a href="{{ notice.file.url }}" download 

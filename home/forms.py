@@ -11,6 +11,7 @@ from .models import (
     Event,
     Faculty,
     FacultyTab,
+    FooterLink,
     HeroSection,
     ImageSlideshow,
     MarqueeItem,
@@ -638,6 +639,23 @@ class SiteConfigurationForm(forms.ModelForm):
             "meta_description": forms.Textarea(attrs={"class": "form-input", "rows": 3}),
             "meta_keywords": forms.Textarea(attrs={"class": "form-input", "rows": 2}),
             "is_active": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
+        }
+
+
+class FooterLinkForm(forms.ModelForm):
+    class Meta:
+        model = FooterLink
+        fields = ["name", "url", "display_order"]
+        widgets = {
+            "name": forms.TextInput(
+                attrs={"class": "form-input", "placeholder": "Link name"}
+            ),
+            "url": forms.TextInput(
+                attrs={"class": "form-input", "placeholder": "URL"}
+            ),
+            "display_order": forms.NumberInput(
+                attrs={"class": "form-input", "placeholder": "Display order"}
+            ),
         }
 
 

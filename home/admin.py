@@ -7,14 +7,18 @@ from .models import (
     Course,
     Curriculum,
     CurriculumSemester,
+    Department,
     Event,
     Faculty,
+    FacultyTab,
+    FooterLink,
     HeroSection,
     MarqueeItem,
     Notice,
     PrincipalMessage,
     Program,
     ProgramFeature,
+    SiteConfiguration,
     SiteLogo,
 )
 
@@ -76,13 +80,13 @@ class FacultyAdmin(admin.ModelAdmin):
 
 @admin.register(HeroSection)
 class HeroSectionAdmin(admin.ModelAdmin):
-    list_display = ["title", "is_active"]
-    list_editable = ["is_active"]
+    list_display = ["title", "is_active", "display_order"]
+    list_editable = ["is_active", "display_order"]
 
     fieldsets = (
         ("Content", {"fields": ("title", "subtitle", "background_image")}),
         ("Call to Action", {"fields": ("cta_text", "cta_link")}),
-        ("Status", {"fields": ("is_active",)}),
+        ("Status", {"fields": ("is_active", "display_order")}),
     )
 
 
@@ -110,19 +114,12 @@ class PrincipalMessageAdmin(admin.ModelAdmin):
     )
 
 
-class ProgramFeatureInline(admin.TabularInline):
-    model = ProgramFeature
-    extra = 1
-    fields = ["feature_text", "icon", "display_order"]
-
-
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
     list_display = ["code", "full_name", "duration", "is_active"]
     list_filter = ["is_active"]
     search_fields = ["code", "full_name", "short_description"]
     list_editable = ["is_active"]
-    inlines = [ProgramFeatureInline]
 
     fieldsets = (
         ("Basic Information", {"fields": ("code", "full_name", "duration")}),
@@ -184,25 +181,10 @@ class CourseInline(admin.TabularInline):
     ordering = ["display_order", "code"]
 
 
-class CurriculumSemesterInline(admin.StackedInline):
-    model = CurriculumSemester
-    extra = 0
-    fields = ["semester_number", "description", "display_order"]
-    ordering = ["semester_number"]
-
-
-class CareerProspectInline(admin.TabularInline):
-    model = CareerProspect
-    extra = 1
-    fields = ["title", "icon", "display_order"]
-    ordering = ["display_order"]
-
-
 @admin.register(Curriculum)
 class CurriculumAdmin(admin.ModelAdmin):
     list_display = ["program", "duration", "is_active"]
     list_editable = ["is_active"]
-    inlines = [CurriculumSemesterInline, CareerProspectInline]
 
     fieldsets = (
         ("Program Information", {"fields": ("program", "duration")}),
@@ -226,33 +208,50 @@ class CurriculumSemesterAdmin(admin.ModelAdmin):
         ("Semester Information", {"fields": ("curriculum", "semester_number")}),
         ("Content", {"fields": ("description", "display_order")}),
     )
-
-
-@admin.register(Course)
-class CourseAdmin(admin.ModelAdmin):
-    list_display = ["code", "title", "semester", "credits", "display_order"]
-    list_filter = ["semester__curriculum", "semester__semester_number"]
-    search_fields = ["code", "title"]
-    ordering = [
-        "semester__curriculum",
-        "semester__semester_number",
-        "display_order",
-        "code",
-    ]
-
-    fieldsets = (
-        ("Course Information", {"fields": ("semester", "code", "title", "credits")}),
-        ("Details", {"fields": ("description", "display_order")}),
-    )
+    
+@admin.register(ProgramFeature)
+class ProgramFeatureAdmin(admin.ModelAdmin):
+    list_display = ('program', 'feature_text', 'display_order')
+    list_filter = ('program',)
+    search_fields = ('feature_text',)
+    list_editable = ('display_order',)
 
 
 @admin.register(CareerProspect)
 class CareerProspectAdmin(admin.ModelAdmin):
-    list_display = ["curriculum", "title", "icon", "display_order"]
-    list_filter = ["curriculum"]
-    ordering = ["curriculum", "display_order"]
+    list_display = ('curriculum', 'title', 'display_order')
+    list_filter = ('curriculum',)
+    search_fields = ('title',)
+    list_editable = ('display_order',)
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'short_name', 'display_order', 'is_active')
+    list_editable = ('display_order', 'is_active')
+    search_fields = ('name', 'short_name')
+
+@admin.register(FacultyTab)
+class FacultyTabAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'department_filter', 'display_order', 'is_active')
+    list_editable = ('display_order', 'is_active')
+    prepopulated_fields = {'slug': ('name',)}
+
+@admin.register(SiteConfiguration)
+class SiteConfigurationAdmin(admin.ModelAdmin):
+    list_display = ('college_name', 'short_name', 'is_active')
+    list_editable = ('is_active',)
 
     fieldsets = (
-        ("Career Information", {"fields": ("curriculum", "title")}),
-        ("Display", {"fields": ("icon", "display_order")}),
+        ("College Identity", {"fields": ("college_name", "short_name", "tagline", "established_year")}),
+        ("About Section", {"fields": ("about_us", "mission", "vision", "core_values")}),
+        ("Footer", {"fields": ("footer_about", "footer_text")}),
+        ("Social Media Links", {"fields": ("facebook_url", "twitter_url", "instagram_url", "linkedin_url", "youtube_url")}),
+        ("SEO", {"fields": ("meta_description", "meta_keywords")}),
+        ("Settings", {"fields": ("is_active",)}),
     )
+
+@admin.register(FooterLink)
+class FooterLinkAdmin(admin.ModelAdmin):
+    list_display = ('name', 'url', 'display_order')
+    list_editable = ('display_order',)
+

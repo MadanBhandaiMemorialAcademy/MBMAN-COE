@@ -206,60 +206,25 @@
                 </div>
             </div>
 
-            <!-- Contact Messages -->
+            <!-- Quick Links Management -->
             <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-900">
-                        <i class="fas fa-envelope text-purple-600 mr-2"></i>Contact Messages
+                        <i class="fas fa-link text-red-600 mr-2"></i>Quick Links
                     </h3>
-                </div>
-                <div class="space-y-2">
-                    <a href="{% url 'home:message_list' %}" class="block px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
-                        <i class="fas fa-inbox text-gray-600 mr-2"></i>
-                        <span class="font-medium">View Messages</span>
+                    <a href="{% url 'home:footer_link_add' %}" class="text-sm text-red-600 hover:text-red-700 font-semibold">
+                        <i class="fas fa-plus mr-1"></i>Add Link
                     </a>
                 </div>
-                
-                <!-- Recent Messages Preview -->
-                {% if recent_messages %}
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                    <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Recent Messages</p>
-                    <div class="space-y-2">
-                        {% for msg in recent_messages %}
-                        <a href="{% url 'home:message_view' msg.pk %}" class="block text-sm hover:bg-gray-50 rounded p-2">
-                            <p class="font-medium text-gray-900 truncate">{{ msg.name }}</p>
-                            <p class="text-xs text-gray-500 truncate">{{ msg.message|slice:":50" }}...</p>
-                        </a>
-                        {% endfor %}
-                    </div>
+                <div class="space-y-2">
+                    <a href="{% url 'home:footer_link_list' %}" class="block px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                        <i class="fas fa-list text-gray-600 mr-2"></i>
+                        <span class="font-medium">Manage Quick Links</span>
+                    </a>
                 </div>
-                {% endif %}
             </div>
 
         </div>
-
-        <!-- Quick Links -->
-        <div class="mt-8 bg-white p-6 rounded-lg shadow-md border border-gray-200">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">
-                <i class="fas fa-link text-gray-600 mr-2"></i>Quick Links
-            </h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <a href="/django-admin/" target="_blank" class="px-4 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition text-center font-semibold">
-                    <i class="fas fa-database mr-2"></i>Django Admin
-                </a>
-                <a href="{% url 'home:contact_info_edit' %}" class="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-center font-semibold">
-                    <i class="fas fa-phone mr-2"></i>Contact Info
-                </a>
-                <a href="{% url 'home:page_content' %}" class="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-center font-semibold">
-                    <i class="fas fa-file-alt mr-2"></i>Page Content
-                </a>
-                <a href="{% url 'home:index' %}" class="px-4 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition text-center font-semibold">
-                    <i class="fas fa-home mr-2"></i>View Website
-                </a>
-            </div>
-        </div>
-
     </div>
 </div>
 {% endblock %}
-
