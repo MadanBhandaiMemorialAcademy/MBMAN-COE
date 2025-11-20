@@ -11,7 +11,7 @@ class Notice(models.Model):
     ]
 
     title = models.CharField(max_length=200)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     date_bs = models.CharField(
         max_length=50, help_text="Date in Bikram Sambat (e.g., Kartik 25, 2082)"
     )
