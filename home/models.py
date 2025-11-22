@@ -1,6 +1,8 @@
 from django.db import models
 
 
+from admin_ordering.models import OrderableModel
+
 class Notice(models.Model):
     """Model for notices and announcements"""
 
@@ -26,11 +28,12 @@ class Notice(models.Model):
         help_text="PDF or document attachment",
     )
     is_active = models.BooleanField(default=True)
+    display_order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ['display_order', "-created_at"]
         verbose_name = "Notice"
         verbose_name_plural = "Notices"
 
@@ -51,7 +54,7 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ['-created_at']
         verbose_name = "Event"
         verbose_name_plural = "Events"
 

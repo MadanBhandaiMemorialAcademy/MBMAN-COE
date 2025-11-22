@@ -181,9 +181,14 @@ def error_500(request):
     return render(request, "500.html", status=500)
 
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
+
 def notices_page(request):
     """Public notices page - list all notices"""
-    notices = Notice.objects.filter(is_active=True).order_by(
+    query = request.GET.get('q')
+    notices_list = Notice.objects.filter(is_active=True).order_by(
+        'display_order',
         models.Case(
             models.When(priority="urgent", then=0),
             models.When(priority="highlight", then=1),
@@ -193,8 +198,24 @@ def notices_page(request):
         ),
         "-created_at",
     )
+
+    if query:
+        notices_list = notices_list.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+
+    paginator = Paginator(notices_list, 10)  # Show 10 notices per page
+    page = request.GET.get('page')
+    try:
+        notices = paginator.page(page)
+    except PageNotAnInteger:
+        notices = paginator.page(1)
+    except EmptyPage:
+        notices = paginator.page(paginator.num_pages)
+
     context = {
         "notices": notices,
+        'query': query,
     }
     return render(request, "home/notices.html", context)
 
@@ -264,7 +285,7 @@ def admin_dashboard(request):
 @user_passes_test(lambda u: u.is_staff)
 def notice_list(request):
     """List all notices"""
-    notices = Notice.objects.all().order_by("-date_bs", "-created_at")
+    notices = Notice.objects.all().order_by("display_order", "-date_bs", "-created_at")
     return render(request, "home/admin/notice_list.html", {"notices": notices})
 
 
@@ -319,6 +340,30 @@ def notice_delete(request, pk):
     return redirect("home:notice_list")
 
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def notice_reorder(request):
+    """Reorder notices via AJAX"""
+    import json
+    from django.http import JsonResponse
+
+    try:
+        data = json.loads(request.body)
+        order = data.get("order", [])
+        
+        if not order:
+            return JsonResponse({"status": "error", "message": "No order provided"}, status=400)
+
+        # Update display_order for each item
+        for index, pk in enumerate(order):
+            Notice.objects.filter(pk=pk).update(display_order=index)
+
+        return JsonResponse({"status": "success", "message": "Order updated successfully"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+
 # ============= EVENT MANAGEMENT =============
 
 
@@ -326,7 +371,7 @@ def notice_delete(request, pk):
 @user_passes_test(lambda u: u.is_staff)
 def event_list(request):
     """List all events"""
-    events = Event.objects.all().order_by("-date_bs", "-created_at")
+    events = Event.objects.all().order_by("-created_at")
     return render(request, "home/admin/event_list.html", {"events": events})
 
 

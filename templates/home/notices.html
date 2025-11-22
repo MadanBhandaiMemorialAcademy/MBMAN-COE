@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block title %}Notices - Sagarmatha Ordinary School{% endblock %}
 
@@ -11,81 +12,79 @@
     </div>
 </section>
 
-<!-- Notices Grid -->
+<!-- Notices List -->
 <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {% for notice in notices %}
-            <a href="{% url 'home:notice_detail' notice.pk %}" class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                <div class="p-6">
-                    <!-- Priority Badge -->
-                    <div class="mb-4">
-                        {% if notice.priority == 'urgent' %}
-                        <span class="inline-block px-3 py-1 text-xs font-semibold text-white bg-red-600 rounded-full">
-                            <i class="fas fa-exclamation-circle mr-1"></i> URGENT
-                        </span>
-                        {% elif notice.priority == 'highlight' %}
-                        <span class="inline-block px-3 py-1 text-xs font-semibold text-gray-800 bg-yellow-400 rounded-full">
-                            <i class="fas fa-star mr-1"></i> IMPORTANT
-                        </span>
-                        {% else %}
-                        <span class="inline-block px-3 py-1 text-xs font-semibold text-white bg-blue-600 rounded-full">
-                            <i class="fas fa-info-circle mr-1"></i> NOTICE
-                        </span>
-                        {% endif %}
-                    </div>
-
-                    <!-- Notice Title -->
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                        {{ notice.title }}
-                    </h3>
-
-                    <!-- Notice Description -->
-                    <p class="text-gray-600 mb-4 line-clamp-3">
-                        {{ notice.description|truncatewords:30 }}
-                    </p>
-
-                    <!-- Notice Meta -->
-                    <div class="flex items-center justify-between text-sm text-gray-500">
-                        <div class="flex items-center">
-                            <i class="far fa-calendar mr-2"></i>
-                            <span>{{ notice.date_bs }}</span>
-                        </div>
-                        {% if notice.file or notice.image %}
-                        <div class="flex items-center gap-2">
-                            {% if notice.image %}
-                            <i class="far fa-image text-blue-600"></i>
-                            {% endif %}
-                            {% if notice.file %}
-                            <i class="far fa-file-pdf text-red-600"></i>
-                            {% endif %}
-                        </div>
-                        {% endif %}
+        <!-- Search Bar -->
+        <div class="mb-8 max-w-lg mx-auto">
+            <form method="get" action="{% url 'home:notices_page' %}">
+                <div class="relative">
+                    <input type="text" name="q" value="{{ request.GET.q }}" class="form-input w-full pl-10" placeholder="Search notices...">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
                     </div>
                 </div>
-
-                <!-- Image Preview (if available) -->
-                {% if notice.image %}
-                <div class="h-48 overflow-hidden">
-                    <img src="{{ notice.image.url }}" alt="{{ notice.title }}" 
-                         class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
-                </div>
-                {% endif %}
-            </a>
-            {% empty %}
-            <div class="col-span-full text-center py-12">
-                <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-                <p class="text-xl text-gray-500">No notices available at the moment.</p>
-            </div>
-            {% endfor %}
+            </form>
         </div>
 
-        <!-- Pagination (if needed in future) -->
+        <div class="bg-white rounded-lg shadow-md">
+            <ul class="divide-y divide-gray-200">
+                {% for notice in notices %}
+                <li class="hover:bg-gray-50">
+                    <a href="{% url 'home:notice_detail' notice.pk %}" class="block p-6">
+                        <div class="flex items-start">
+                            <div class="mr-6 text-center">
+                                {% with notice.date_bs|split_nepali_date as date_parts %}
+                                <div class="text-sm text-gray-500">{{ date_parts.month }}</div>
+                                <div class="text-3xl font-bold text-gray-900">{{ date_parts.day }}</div>
+                                <div class="text-sm text-gray-500">{{ date_parts.year }}</div>
+                                {% endwith %}
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="text-xl font-bold text-gray-900 line-clamp-1">{{ notice.title }}</h3>
+                                    {% if notice.priority == 'urgent' %}
+                                    <span class="inline-block px-3 py-1 text-xs font-semibold text-white bg-red-600 rounded-full">
+                                        <i class="fas fa-exclamation-circle mr-1"></i> URGENT
+                                    </span>
+                                    {% elif notice.priority == 'highlight' %}
+                                    <span class="inline-block px-3 py-1 text-xs font-semibold text-gray-800 bg-yellow-400 rounded-full">
+                                        <i class="fas fa-star mr-1"></i> IMPORTANT
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-gray-600 mb-2 line-clamp-2">{{ notice.description|truncatewords:30 }}</p>
+                                <div class="flex items-center text-sm text-gray-500">
+                                    {% if notice.file or notice.image %}
+                                    <div class="flex items-center gap-2">
+                                        {% if notice.image %}
+                                        <i class="far fa-image text-blue-600"></i>
+                                        {% endif %}
+                                        {% if notice.file %}
+                                        <i class="far fa-file-pdf text-red-600"></i>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                {% empty %}
+                <li class="p-8 text-center text-gray-500">
+                    <i class="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
+                    <p>No notices found.</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Pagination -->
         {% if notices.has_other_pages %}
-        <div class="mt-12 flex justify-center">
+        <div class="mt-8 flex justify-center">
             <nav class="inline-flex rounded-md shadow-sm">
                 {% if notices.has_previous %}
-                <a href="?page={{ notices.previous_page_number }}" 
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ notices.previous_page_number }}" 
                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50">
                     Previous
                 </a>
@@ -96,7 +95,7 @@
                 </span>
                 
                 {% if notices.has_next %}
-                <a href="?page={{ notices.next_page_number }}" 
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ notices.next_page_number }}" 
                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50">
                     Next
                 </a>

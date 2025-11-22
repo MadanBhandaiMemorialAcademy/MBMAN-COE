@@ -176,9 +176,11 @@
                     {% for notice in notices %}
                     <a href="{% url 'home:notice_detail' notice.pk %}" class="block {% if notice.priority == 'urgent' %}bg-red-50{% else %}bg-white{% endif %} p-5 rounded-xl shadow-sm border-l-4 {% if notice.priority == 'urgent' %}border-red-500{% elif notice.priority == 'highlight' %}border-yellow-500{% else %}border-gray-300{% endif %} flex items-start hover:shadow-md transition">
                         <div class="text-center mr-6 pr-6 border-r {% if notice.priority == 'urgent' %}border-red-100{% else %}border-gray-100{% endif %} min-w-[80px]">
-                            <span class="block text-sm font-bold {% if notice.priority == 'urgent' %}text-red-400{% else %}text-gray-400{% endif %} uppercase">{{ notice.date_bs|slice:":6" }}</span>
-                            <span class="block text-3xl font-extrabold {% if notice.priority == 'urgent' %}text-red-600{% elif notice.priority == 'highlight' %}text-yellow-600{% else %}text-gray-600{% endif %}">{{ notice.date_bs|slice:"7:9" }}</span>
-                            <span class="block text-xs {% if notice.priority == 'urgent' %}text-red-400{% else %}text-gray-400{% endif %}">{{ notice.date_bs|slice:"-4:" }}</span>
+                            {% with notice.date_bs|split_nepali_date as date_parts %}
+                            <span class="block text-sm font-bold {% if notice.priority == 'urgent' %}text-red-400{% else %}text-gray-400{% endif %} uppercase">{{ date_parts.month }}</span>
+                            <span class="block text-3xl font-extrabold {% if notice.priority == 'urgent' %}text-red-600{% elif notice.priority == 'highlight' %}text-yellow-600{% else %}text-gray-600{% endif %}">{{ date_parts.day }}</span>
+                            <span class="block text-xs {% if notice.priority == 'urgent' %}text-red-400{% else %}text-gray-400{% endif %}">{{ date_parts.year }}</span>
+                            {% endwith %}
                         </div>
                         <div class="flex-1">
                             <h3 class="font-bold {% if notice.priority == 'urgent' %}text-red-700{% else %}text-gray-800{% endif %} text-lg mb-2 hover:text-mbman-blue transition">{% if notice.priority == 'urgent' %}URGENT: {% endif %}{{ notice.title }}</h3>
@@ -198,6 +200,11 @@
                         <p>No notices available at the moment.</p>
                     </div>
                     {% endfor %}
+                    <div class="mt-6 text-center">
+                        <a href="{% url 'home:notices_page' %}" class="inline-block px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition">
+                            See All Notices
+                        </a>
+                    </div>
                 </div>
 
                 <!-- EVENTS LIST (Hidden by default) -->
@@ -205,8 +212,11 @@
                     {% for event in events %}
                     <a href="{% url 'home:event_detail' event.pk %}" class="block bg-white p-5 rounded-xl shadow-sm border-l-4 {% if event.is_highlight %}border-mbman-gold{% else %}border-green-500{% endif %} flex items-start hover:shadow-md transition">
                         <div class="text-center mr-6 pr-6 border-r border-gray-100 min-w-[80px]">
-                            <span class="block text-sm font-bold {% if event.is_highlight %}text-mbman-gold{% else %}text-green-600{% endif %} uppercase">{{ event.date_bs|slice:":6" }}</span>
-                            <span class="block text-3xl font-extrabold text-gray-800">{{ event.date_bs|slice:"7:9" }}</span>
+                            {% with event.date_bs|split_nepali_date as date_parts %}
+                            <span class="block text-sm font-bold {% if event.is_highlight %}text-mbman-gold{% else %}text-green-600{% endif %} uppercase">{{ date_parts.month }}</span>
+                            <span class="block text-3xl font-extrabold text-gray-800">{{ date_parts.day }}</span>
+                            <span class="block text-xs text-gray-400">{{ date_parts.year }}</span>
+                            {% endwith %}
                         </div>
                         <div class="flex-1">
                             {% if event.is_highlight %}

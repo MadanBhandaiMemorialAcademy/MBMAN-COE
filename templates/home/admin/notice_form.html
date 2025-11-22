@@ -2,6 +2,10 @@
 {% load static %}
 
 {% block title %}{{ title }} - Admin{% endblock %}
+{% block extra_css %}
+<link href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css" rel="stylesheet" type="text/css"/>
+{% endblock %}
+
 
 {% block content %}
 <div class="min-h-screen bg-gray-100 py-8">
@@ -113,5 +117,13 @@
         </div>
 
     </div>
-</div>
+{% block extra_js %}
+<script src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    window.onload = function() {
+        var mainInput = document.getElementById("nepali-datepicker");
+        mainInput.nepaliDatePicker();
+    };
+</script>
+{% endblock %}
 {% endblock %}

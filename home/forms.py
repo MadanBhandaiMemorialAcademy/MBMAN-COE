@@ -50,7 +50,8 @@ class NoticeForm(forms.ModelForm):
             "date_bs": forms.TextInput(
                 attrs={
                     "class": "form-input",
-                    "placeholder": "DD/MM/YYYY (e.g., 15/08/2081)",
+                    "placeholder": "YYYY-MM-DD",
+                    "id": "nepali-datepicker",
                 }
             ),
             "priority": forms.Select(attrs={"class": "form-input"}),
@@ -88,7 +89,8 @@ class EventForm(forms.ModelForm):
             "date_bs": forms.TextInput(
                 attrs={
                     "class": "form-input",
-                    "placeholder": "DD/MM/YYYY (e.g., 15/08/2081)",
+                    "placeholder": "YYYY-MM-DD",
+                    "id": "nepali-datepicker-event",
                 }
             ),
             "time": forms.TextInput(

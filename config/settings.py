@@ -39,7 +39,9 @@ BASE_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    "adminsortable2",
+]
 LOCAL_APPS = [
     "auth.apps.AuthConfig",
     "home.apps.HomeConfig",

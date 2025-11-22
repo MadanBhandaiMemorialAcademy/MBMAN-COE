@@ -24,6 +24,7 @@ urlpatterns = [
     path("admin/notices/add/", views.notice_add, name="notice_add"),
     path("admin/notices/<int:pk>/edit/", views.notice_edit, name="notice_edit"),
     path("admin/notices/<int:pk>/delete/", views.notice_delete, name="notice_delete"),
+    path("admin/notices/reorder/", views.notice_reorder, name="notice_reorder"),
     # Event Management
     path("admin/events/", views.event_list, name="event_list"),
     path("admin/events/add/", views.event_add, name="event_add"),
