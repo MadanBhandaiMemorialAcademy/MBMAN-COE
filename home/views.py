@@ -9,6 +9,8 @@ from .forms import (
     EventForm,
     FacultyForm,
     FooterLinkForm,
+    GalleryAlbumForm,
+    GalleryImageForm,
     HeroSectionForm,
     MarqueeItemForm,
     NoticeForm,
@@ -25,6 +27,8 @@ from .models import (
     Event,
     Faculty,
     FooterLink,
+    GalleryAlbum,
+    GalleryImage,
     HeroSection,
     MarqueeItem,
     Notice,
@@ -75,6 +79,7 @@ def index(request):
         "site_config": SiteConfiguration.objects.filter(is_active=True).first(),
         "hero_slides": HeroSection.objects.filter(is_active=True),
         "hero": HeroSection.objects.filter(is_active=True).first(),
+        "spotlight_images": GalleryImage.objects.filter(is_spotlight=True).order_by("?")[:8],
         "gallery_slides": ImageSlideshow.objects.filter(
             display_location="homepage_gallery", is_active=True
         ),
@@ -91,6 +96,34 @@ def index(request):
         "site_logo": SiteLogo.objects.filter(is_active=True).first(),
     }
     return render(request, "home/index.html", context)
+
+
+def gallery_page(request):
+    """Public gallery page - Lists Albums"""
+    albums = GalleryAlbum.objects.all().order_by("display_order", "-created_at")
+    return render(request, "home/gallery.html", {"albums": albums})
+
+
+def gallery_album_detail(request, pk):
+    """View images in a specific album"""
+    album = get_object_or_404(GalleryAlbum, pk=pk)
+    images = album.images.all().order_by("display_order", "-created_at")
+    
+    # Pagination
+    paginator = Paginator(images, 12)
+    page = request.GET.get("page")
+    try:
+        gallery_images = paginator.page(page)
+    except PageNotAnInteger:
+        gallery_images = paginator.page(1)
+    except EmptyPage:
+        gallery_images = paginator.page(paginator.num_pages)
+
+    return render(
+        request, 
+        "home/gallery_album_detail.html", 
+        {"album": album, "gallery_images": gallery_images}
+    )
 
 
 def curriculum_page(request, slug):
@@ -181,9 +214,14 @@ def error_500(request):
     return render(request, "500.html", status=500)
 
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
+
 def notices_page(request):
     """Public notices page - list all notices"""
-    notices = Notice.objects.filter(is_active=True).order_by(
+    query = request.GET.get('q')
+    notices_list = Notice.objects.filter(is_active=True).order_by(
+        'display_order',
         models.Case(
             models.When(priority="urgent", then=0),
             models.When(priority="highlight", then=1),
@@ -193,8 +231,24 @@ def notices_page(request):
         ),
         "-created_at",
     )
+
+    if query:
+        notices_list = notices_list.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+
+    paginator = Paginator(notices_list, 10)  # Show 10 notices per page
+    page = request.GET.get('page')
+    try:
+        notices = paginator.page(page)
+    except PageNotAnInteger:
+        notices = paginator.page(1)
+    except EmptyPage:
+        notices = paginator.page(paginator.num_pages)
+
     context = {
         "notices": notices,
+        'query': query,
     }
     return render(request, "home/notices.html", context)
 
@@ -264,7 +318,7 @@ def admin_dashboard(request):
 @user_passes_test(lambda u: u.is_staff)
 def notice_list(request):
     """List all notices"""
-    notices = Notice.objects.all().order_by("-date_bs", "-created_at")
+    notices = Notice.objects.all().order_by("display_order", "-date_bs", "-created_at")
     return render(request, "home/admin/notice_list.html", {"notices": notices})
 
 
@@ -319,6 +373,30 @@ def notice_delete(request, pk):
     return redirect("home:notice_list")
 
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def notice_reorder(request):
+    """Reorder notices via AJAX"""
+    import json
+    from django.http import JsonResponse
+
+    try:
+        data = json.loads(request.body)
+        order = data.get("order", [])
+        
+        if not order:
+            return JsonResponse({"status": "error", "message": "No order provided"}, status=400)
+
+        # Update display_order for each item
+        for index, pk in enumerate(order):
+            Notice.objects.filter(pk=pk).update(display_order=index)
+
+        return JsonResponse({"status": "success", "message": "Order updated successfully"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+
 # ============= EVENT MANAGEMENT =============
 
 
@@ -326,7 +404,7 @@ def notice_delete(request, pk):
 @user_passes_test(lambda u: u.is_staff)
 def event_list(request):
     """List all events"""
-    events = Event.objects.all().order_by("-date_bs", "-created_at")
+    events = Event.objects.all().order_by("-created_at")
     return render(request, "home/admin/event_list.html", {"events": events})
 
 
@@ -545,26 +623,59 @@ def page_content(request):
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
-def hero_edit(request):
-    """Edit hero section"""
-    hero = HeroSection.objects.filter(is_active=True).first()
+def hero_list(request):
+    """List all hero slides"""
+    slides = HeroSection.objects.all().order_by("display_order", "-created_at")
+    return render(request, "home/admin/hero_list.html", {"slides": slides})
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def hero_add(request):
+    """Add new hero slide"""
+    if request.method == "POST":
+        form = HeroSectionForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Hero slide added successfully!")
+            return redirect("home:hero_list")
+    else:
+        form = HeroSectionForm()
+
+    return render(
+        request, "home/admin/hero_form.html", {"form": form, "title": "Add Hero Slide"}
+    )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def hero_edit(request, pk):
+    """Edit hero slide"""
+    hero = get_object_or_404(HeroSection, pk=pk)
 
     if request.method == "POST":
         form = HeroSectionForm(request.POST, request.FILES, instance=hero)
         if form.is_valid():
-            # Deactivate all other hero sections
-            HeroSection.objects.all().update(is_active=False)
-            hero_instance = form.save(commit=False)
-            hero_instance.is_active = True
-            hero_instance.save()
-            messages.success(request, "Hero section updated successfully!")
-            return redirect("home:page_content")
+            form.save()
+            messages.success(request, "Hero slide updated successfully!")
+            return redirect("home:hero_list")
     else:
         form = HeroSectionForm(instance=hero)
 
     return render(
-        request, "home/admin/hero_form.html", {"form": form, "title": "Edit Hero Section"}
+        request, "home/admin/hero_form.html", {"form": form, "title": "Edit Hero Slide"}
     )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def hero_delete(request, pk):
+    """Delete hero slide"""
+    hero = get_object_or_404(HeroSection, pk=pk)
+    hero.delete()
+    messages.success(request, "Hero slide deleted successfully!")
+    return redirect("home:hero_list")
 
 
 @login_required
@@ -1312,3 +1423,163 @@ def about_page(request):
             "site_logo": SiteLogo.objects.filter(is_active=True).first(),
         },
     )
+
+
+# ============= GALLERY ALBUM MANAGEMENT =============
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def album_list(request):
+    """List all gallery albums"""
+    albums = GalleryAlbum.objects.all().order_by("display_order", "-created_at")
+    return render(request, "home/admin/album_list.html", {"albums": albums})
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def album_add(request):
+    """Add new album"""
+    if request.method == "POST":
+        form = GalleryAlbumForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Album created successfully!")
+            return redirect("home:album_list")
+    else:
+        form = GalleryAlbumForm()
+
+    return render(
+        request, "home/admin/album_form.html", {"form": form, "title": "Add Album"}
+    )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def album_edit(request, pk):
+    """Edit album"""
+    album = get_object_or_404(GalleryAlbum, pk=pk)
+
+    if request.method == "POST":
+        form = GalleryAlbumForm(request.POST, instance=album)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Album updated!")
+            return redirect("home:album_list")
+    else:
+        form = GalleryAlbumForm(instance=album)
+
+    return render(
+        request,
+        "home/admin/album_form.html",
+        {"form": form, "title": "Edit Album", "album": album},
+    )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def album_delete(request, pk):
+    """Delete album"""
+    album = get_object_or_404(GalleryAlbum, pk=pk)
+    album.delete()
+    messages.success(request, "Album deleted!")
+    return redirect("home:album_list")
+
+
+# ============= GALLERY MANAGEMENT =============
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def gallery_list(request):
+    """List all gallery images"""
+    filter_type = request.GET.get("filter")
+    images = GalleryImage.objects.all()
+    title = "Manage Photo Gallery"
+
+    if filter_type == "spotlight":
+        images = images.filter(is_spotlight=True)
+        title = "Manage Spotlight Images"
+
+    images = images.order_by("display_order", "-created_at")
+    return render(
+        request,
+        "home/admin/gallery_list.html",
+        {"images": images, "title": title, "filter": filter_type},
+    )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def gallery_add(request):
+    """Add new gallery image"""
+    if request.method == "POST":
+        form = GalleryImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Image added to gallery!")
+            return redirect("home:gallery_list")
+    else:
+        form = GalleryImageForm()
+
+    return render(
+        request, "home/admin/gallery_form.html", {"form": form, "title": "Add Gallery Image"}
+    )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def gallery_edit(request, pk):
+    """Edit gallery image"""
+    image = get_object_or_404(GalleryImage, pk=pk)
+
+    if request.method == "POST":
+        form = GalleryImageForm(request.POST, request.FILES, instance=image)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Gallery image updated!")
+            return redirect("home:gallery_list")
+    else:
+        form = GalleryImageForm(instance=image)
+
+    return render(
+        request,
+        "home/admin/gallery_form.html",
+        {"form": form, "title": "Edit Gallery Image", "image": image},
+    )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def gallery_delete(request, pk):
+    """Delete gallery image"""
+    image = get_object_or_404(GalleryImage, pk=pk)
+    image.delete()
+    messages.success(request, "Gallery image deleted!")
+    return redirect("home:gallery_list")
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def gallery_reorder(request):
+    """Reorder gallery images via AJAX"""
+    import json
+    from django.http import JsonResponse
+
+    try:
+        data = json.loads(request.body)
+        order = data.get("order", [])
+        
+        if not order:
+            return JsonResponse({"status": "error", "message": "No order provided"}, status=400)
+
+        # Update display_order for each item
+        for index, pk in enumerate(order):
+            GalleryImage.objects.filter(pk=pk).update(display_order=index)
+
+        return JsonResponse({"status": "success", "message": "Order updated successfully"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=400)

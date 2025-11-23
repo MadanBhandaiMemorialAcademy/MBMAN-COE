@@ -1,6 +1,8 @@
 from django.db import models
 
 
+from admin_ordering.models import OrderableModel
+
 class Notice(models.Model):
     """Model for notices and announcements"""
 
@@ -26,11 +28,12 @@ class Notice(models.Model):
         help_text="PDF or document attachment",
     )
     is_active = models.BooleanField(default=True)
+    display_order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ['display_order', "-created_at"]
         verbose_name = "Notice"
         verbose_name_plural = "Notices"
 
@@ -51,7 +54,7 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ['-created_at']
         verbose_name = "Event"
         verbose_name_plural = "Events"
 
@@ -749,3 +752,65 @@ class AboutSection(models.Model):
 
     def __str__(self):
         return f"{self.get_section_type_display()} - {self.title}"
+
+
+class GalleryAlbum(models.Model):
+    """Model for photo gallery albums"""
+
+    title = models.CharField(max_length=200, help_text="Album title")
+    description = models.TextField(blank=True, null=True, help_text="Optional description")
+    display_order = models.IntegerField(default=0, help_text="Order of display")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["display_order", "-created_at"]
+        verbose_name = "Gallery Album"
+        verbose_name_plural = "Gallery Albums"
+
+    def __str__(self):
+        return self.title
+
+    def get_cover_images(self):
+        """Return images marked as cover for this album"""
+        return self.images.filter(is_cover=True)
+
+    def get_random_cover(self):
+        """Return a single cover image or first image if no cover"""
+        cover = self.images.filter(is_cover=True).first()
+        if not cover:
+            cover = self.images.first()
+        return cover
+
+
+class GalleryImage(models.Model):
+    """Model for photo gallery images"""
+
+    album = models.ForeignKey(
+        GalleryAlbum,
+        on_delete=models.CASCADE,
+        related_name="images",
+        null=True,
+        blank=True,
+        help_text="Album this image belongs to",
+    )
+    caption = models.CharField(
+        max_length=200, blank=True, null=True, help_text="Optional caption for the image"
+    )
+    image = models.ImageField(upload_to="gallery/", help_text="Gallery image")
+    is_spotlight = models.BooleanField(
+        default=False, help_text="Show this image on homepage spotlight section"
+    )
+    is_cover = models.BooleanField(
+        default=False, help_text="Use this image as album cover"
+    )
+    display_order = models.IntegerField(default=0, help_text="Order of display")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["display_order", "-created_at"]
+        verbose_name = "Gallery Image"
+        verbose_name_plural = "Gallery Images"
+
+    def __str__(self):
+        return self.caption if self.caption else f"Image {self.id}"

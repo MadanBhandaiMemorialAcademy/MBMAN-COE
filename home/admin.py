@@ -23,13 +23,17 @@ from .models import (
 )
 
 
+from admin_ordering.admin import OrderableAdmin
+
+from adminsortable2.admin import SortableAdminMixin
+
 @admin.register(Notice)
-class NoticeAdmin(admin.ModelAdmin):
-    list_display = ["title", "date_bs", "priority", "is_active", "created_at"]
+class NoticeAdmin(SortableAdminMixin, admin.ModelAdmin):
+    list_display = ["title", "date_bs", "priority", "is_active", "display_order", "created_at"]
     list_filter = ["priority", "is_active", "created_at"]
     search_fields = ["title", "description"]
     list_editable = ["is_active"]
-    ordering = ["-created_at"]
+    ordering = ["display_order", "-created_at"]
     readonly_fields = ["created_at", "updated_at"]
 
     fieldsets = (

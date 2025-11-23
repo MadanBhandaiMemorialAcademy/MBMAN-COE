@@ -21,6 +21,8 @@ from .models import (
     ProgramFeature,
     SiteConfiguration,
     SiteLogo,
+    GalleryImage,
+    GalleryAlbum,
 )
 
 
@@ -50,7 +52,8 @@ class NoticeForm(forms.ModelForm):
             "date_bs": forms.TextInput(
                 attrs={
                     "class": "form-input",
-                    "placeholder": "DD/MM/YYYY (e.g., 15/08/2081)",
+                    "placeholder": "YYYY-MM-DD",
+                    "id": "nepali-datepicker",
                 }
             ),
             "priority": forms.Select(attrs={"class": "form-input"}),
@@ -88,7 +91,8 @@ class EventForm(forms.ModelForm):
             "date_bs": forms.TextInput(
                 attrs={
                     "class": "form-input",
-                    "placeholder": "DD/MM/YYYY (e.g., 15/08/2081)",
+                    "placeholder": "YYYY-MM-DD",
+                    "id": "nepali-datepicker-event",
                 }
             ),
             "time": forms.TextInput(
@@ -693,6 +697,45 @@ class ImageSlideshowForm(forms.ModelForm):
             ),
             "display_order": forms.NumberInput(attrs={"class": "form-input"}),
             "is_active": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
+        }
+
+
+class GalleryAlbumForm(forms.ModelForm):
+    class Meta:
+        model = GalleryAlbum
+        fields = ["title", "description", "display_order"]
+        widgets = {
+            "title": forms.TextInput(
+                attrs={"class": "form-input", "placeholder": "Album title"}
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-input",
+                    "rows": 3,
+                    "placeholder": "Album description",
+                }
+            ),
+            "display_order": forms.NumberInput(
+                attrs={"class": "form-input", "placeholder": "Display order"}
+            ),
+        }
+
+
+class GalleryImageForm(forms.ModelForm):
+    class Meta:
+        model = GalleryImage
+        fields = ["album", "caption", "image", "is_spotlight", "is_cover", "display_order"]
+        widgets = {
+            "album": forms.Select(attrs={"class": "form-input"}),
+            "caption": forms.TextInput(
+                attrs={"class": "form-input", "placeholder": "Image caption (optional)"}
+            ),
+            "image": forms.FileInput(attrs={"class": "form-input"}),
+            "is_spotlight": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
+            "is_cover": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
+            "display_order": forms.NumberInput(
+                attrs={"class": "form-input", "placeholder": "Display order"}
+            ),
         }
 
 

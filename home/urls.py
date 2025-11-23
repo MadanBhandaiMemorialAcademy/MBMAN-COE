@@ -17,6 +17,9 @@ urlpatterns = [
     # Public Event Pages
     path("events/", views.events_page, name="events_page"),
     path("events/<int:pk>/", views.event_detail, name="event_detail"),
+    # Public Gallery
+    path("gallery/", views.gallery_page, name="gallery"),
+    path("gallery/<int:pk>/", views.gallery_album_detail, name="gallery_album_detail"),
     # Admin Dashboard
     path("admin/", views.admin_dashboard, name="admin_dashboard"),
     # Notice Management
@@ -24,6 +27,7 @@ urlpatterns = [
     path("admin/notices/add/", views.notice_add, name="notice_add"),
     path("admin/notices/<int:pk>/edit/", views.notice_edit, name="notice_edit"),
     path("admin/notices/<int:pk>/delete/", views.notice_delete, name="notice_delete"),
+    path("admin/notices/reorder/", views.notice_reorder, name="notice_reorder"),
     # Event Management
     path("admin/events/", views.event_list, name="event_list"),
     path("admin/events/add/", views.event_add, name="event_add"),
@@ -49,7 +53,12 @@ urlpatterns = [
     ),
     # Page Content Management
     path("admin/page-content/", views.page_content, name="page_content"),
-    path("admin/hero/edit/", views.hero_edit, name="hero_edit"),
+    # Hero Management
+    path("admin/hero/", views.hero_list, name="hero_list"),
+    path("admin/hero/add/", views.hero_add, name="hero_add"),
+    path("admin/hero/<int:pk>/edit/", views.hero_edit, name="hero_edit"),
+    path("admin/hero/<int:pk>/delete/", views.hero_delete, name="hero_delete"),
+    
     path("admin/logo/edit/", views.logo_edit, name="logo_edit"),
     path("admin/marquee/add/", views.marquee_add, name="marquee_add"),
     path("admin/marquee/<int:pk>/edit/", views.marquee_edit, name="marquee_edit"),
@@ -147,6 +156,17 @@ urlpatterns = [
         views.slideshow_delete,
         name="slideshow_delete",
     ),
+    # Gallery Album Management
+    path("admin/albums/", views.album_list, name="album_list"),
+    path("admin/albums/add/", views.album_add, name="album_add"),
+    path("admin/albums/<int:pk>/edit/", views.album_edit, name="album_edit"),
+    path("admin/albums/<int:pk>/delete/", views.album_delete, name="album_delete"),
+    # Gallery Management
+    path("admin/gallery/", views.gallery_list, name="gallery_list"),
+    path("admin/gallery/add/", views.gallery_add, name="gallery_add"),
+    path("admin/gallery/<int:pk>/edit/", views.gallery_edit, name="gallery_edit"),
+    path("admin/gallery/<int:pk>/delete/", views.gallery_delete, name="gallery_delete"),
+    path("admin/gallery/reorder/", views.gallery_reorder, name="gallery_reorder"),
     # About Sections
     path("admin/about-sections/", views.about_section_list, name="about_section_list"),
     path("admin/about-sections/add/", views.about_section_add, name="about_section_add"),
