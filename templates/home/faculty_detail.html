@@ -109,14 +109,28 @@
                         </div>
                         {% endif %}
 
-                        {% if faculty.website %}
+                        {% if faculty.facebook_url or faculty.twitter_url or faculty.linkedin_url %}
                         <div class="flex items-start">
-                            <i class="fas fa-globe text-blue-600 mt-1 mr-3"></i>
+                            <i class="fas fa-share-alt text-blue-600 mt-1 mr-3"></i>
                             <div>
-                                <p class="text-sm text-gray-500">Website</p>
-                                <a href="{{ faculty.website }}" target="_blank" class="font-medium text-blue-600 hover:underline break-all">
-                                    {{ faculty.website }}
-                                </a>
+                                <p class="text-sm text-gray-500">Social Links</p>
+                                <div class="flex space-x-3 mt-1">
+                                    {% if faculty.facebook_url %}
+                                    <a href="{{ faculty.facebook_url }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-lg" title="Facebook">
+                                        <i class="fab fa-facebook"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if faculty.twitter_url %}
+                                    <a href="{{ faculty.twitter_url }}" target="_blank" class="text-blue-400 hover:text-blue-600 text-lg" title="Twitter/X">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if faculty.linkedin_url %}
+                                    <a href="{{ faculty.linkedin_url }}" target="_blank" class="text-blue-700 hover:text-blue-900 text-lg" title="LinkedIn">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                         {% endif %}

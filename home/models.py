@@ -99,6 +99,9 @@ class Faculty(models.Model):
     website = models.URLField(
         blank=True, null=True, help_text="Personal or professional website"
     )
+    facebook_url = models.URLField(blank=True, null=True, help_text="Facebook profile URL")
+    twitter_url = models.URLField(blank=True, null=True, help_text="Twitter/X profile URL")
+    linkedin_url = models.URLField(blank=True, null=True, help_text="LinkedIn profile URL")
     bio = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     display_order = models.IntegerField(default=0, help_text="Lower numbers appear first")

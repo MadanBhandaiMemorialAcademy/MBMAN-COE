@@ -116,6 +116,9 @@ class FacultyForm(forms.ModelForm):
             "email",
             "phone",
             "website",
+            "facebook_url",
+            "twitter_url",
+            "linkedin_url",
             "bio",
             "is_active",
             "display_order",
@@ -147,6 +150,15 @@ class FacultyForm(forms.ModelForm):
             ),
             "website": forms.URLInput(
                 attrs={"class": "form-input", "placeholder": "https://example.com"}
+            ),
+            "facebook_url": forms.URLInput(
+                attrs={"class": "form-input", "placeholder": "Facebook URL"}
+            ),
+            "twitter_url": forms.URLInput(
+                attrs={"class": "form-input", "placeholder": "Twitter URL"}
+            ),
+            "linkedin_url": forms.URLInput(
+                attrs={"class": "form-input", "placeholder": "LinkedIn URL"}
             ),
             "bio": forms.Textarea(
                 attrs={
