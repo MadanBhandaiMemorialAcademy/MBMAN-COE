@@ -187,14 +187,6 @@
                         <i class="fas fa-edit text-gray-600 mr-2"></i>
                         <span class="font-medium">Edit Page Content</span>
                     </a>
-                    <a href="{% url 'home:hero_edit' %}" class="block px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
-                        <i class="fas fa-image text-gray-600 mr-2"></i>
-                        <span class="font-medium">Edit Hero Section</span>
-                    </a>
-                    <a href="{% url 'home:slideshow_list' %}" class="block px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
-                        <i class="fas fa-images text-gray-600 mr-2"></i>
-                        <span class="font-medium">Image Slideshows</span>
-                    </a>
                     <a href="{% url 'home:about_section_list' %}" class="block px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
                         <i class="fas fa-info-circle text-gray-600 mr-2"></i>
                         <span class="font-medium">About Us Sections</span>
@@ -202,6 +194,37 @@
                     <a href="{% url 'home:principal_message_edit' %}" class="block px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
                         <i class="fas fa-quote-left text-gray-600 mr-2"></i>
                         <span class="font-medium">Edit Principal Message</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Image Management -->
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">
+                        <i class="fas fa-images text-pink-600 mr-2"></i>Image Management
+                    </h3>
+                </div>
+                <div class="space-y-2">
+                    <a href="{% url 'home:album_list' %}" class="block px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                        <i class="fas fa-folder text-gray-600 mr-2"></i>
+                        <span class="font-medium">Manage Albums</span>
+                    </a>
+                    <a href="{% url 'home:gallery_list' %}" class="block px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                        <i class="fas fa-photo-video text-gray-600 mr-2"></i>
+                        <span class="font-medium">Manage All Photos</span>
+                    </a>
+                    <a href="{% url 'home:hero_list' %}" class="block px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                        <i class="fas fa-desktop text-gray-600 mr-2"></i>
+                        <span class="font-medium">Manage Hero Slides</span>
+                    </a>
+                    <a href="{% url 'home:gallery_list' %}?filter=spotlight" class="block px-4 py-3 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition border border-yellow-100">
+                        <i class="fas fa-star text-yellow-600 mr-2"></i>
+                        <span class="font-medium text-yellow-800">Manage Spotlight Images</span>
+                    </a>
+                    <a href="{% url 'home:slideshow_list' %}" class="block px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                        <i class="fas fa-layer-group text-gray-600 mr-2"></i>
+                        <span class="font-medium">Image Slideshows</span>
                     </a>
                 </div>
             </div>

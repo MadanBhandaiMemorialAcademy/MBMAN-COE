@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Hero Slides - Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="mb-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Manage Hero Slides</h1>
+                    <p class="text-gray-500 mt-1">Add and manage slides for the homepage hero carousel.</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'home:admin_dashboard' %}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Dashboard
+                    </a>
+                    <a href="{% url 'home:hero_add' %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-plus mr-2"></i>Add Slide
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+            <div class="px-4 py-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Slides Table -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preview</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Overlay</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for slide in slides %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if slide.background_image %}
+                            <img src="{{ slide.background_image.url }}" alt="Slide" class="h-16 w-24 object-cover rounded">
+                            {% else %}
+                            <div class="h-16 w-24 bg-gray-200 rounded flex items-center justify-center text-gray-400">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">{{ slide.title|striptags|truncatewords:5 }}</div>
+                            <div class="text-xs text-gray-500">{{ slide.subtitle|truncatewords:8 }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ slide.get_background_overlay_display }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ slide.display_order }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                {% if slide.is_active %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {% if slide.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            <a href="{% url 'home:hero_edit' slide.pk %}" class="text-blue-600 hover:text-blue-900">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{% url 'home:hero_delete' slide.pk %}" class="inline" onsubmit="return confirm('Delete this slide?');">
+                                {% csrf_token %}
+                                <button type="submit" class="text-red-600 hover:text-red-900">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                            No hero slides found. <a href="{% url 'home:hero_add' %}" class="text-blue-600 hover:underline">Add one now</a>.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

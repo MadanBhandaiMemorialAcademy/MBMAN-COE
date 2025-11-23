@@ -334,6 +334,39 @@
     </div>
 </section>
 
+<!-- SPOTLIGHT GALLERY SECTION -->
+{% if spotlight_images %}
+<section class="py-20 bg-gray-900 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]"></div>
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="text-center mb-12">
+            <h4 class="text-mbman-gold font-bold uppercase tracking-wider mb-3">Campus Life</h4>
+            <h2 class="text-4xl font-bold text-white mb-6">In the Spotlight</h2>
+            <p class="text-gray-400 max-w-2xl mx-auto text-lg">
+                Capturing moments of creativity, learning, and celebration at MBMAN.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {% for image in spotlight_images %}
+            <div class="group relative aspect-w-1 aspect-h-1 rounded-xl overflow-hidden bg-gray-800">
+                <img src="{{ image.image.url }}" alt="{{ image.caption|default:'Spotlight' }}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 opacity-90 group-hover:opacity-100">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                    <p class="text-white text-sm font-medium truncate">{{ image.caption }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-10">
+            <a href="{% url 'home:gallery' %}" class="inline-flex items-center px-6 py-3 border border-gray-600 hover:border-white text-white font-semibold rounded-lg transition hover:bg-white hover:text-gray-900">
+                View Full Gallery <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <!-- FACULTY SECTION -->
 <section id="faculty" class="py-24 bg-gray-50">
     <div class="container mx-auto px-4">

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ title }} - Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="mb-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ title }}</h1>
+                    <p class="text-gray-500 mt-1">Upload and manage images. Drag to reorder.</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'home:admin_dashboard' %}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                    </a>
+                    <a href="{% url 'home:gallery_add' %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-cloud-upload-alt mr-2"></i>Add Photo
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+            <div class="px-4 py-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Gallery Grid (Sortable) -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            {% if images %}
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="sortable-gallery">
+                {% for image in images %}
+                <div class="relative group bg-gray-50 rounded-lg border border-gray-200 p-2 cursor-move" data-id="{{ image.pk }}">
+                    <div class="aspect-w-1 aspect-h-1 overflow-hidden rounded bg-gray-200 mb-2">
+                        <img src="{{ image.image.url }}" alt="Gallery Image" class="object-cover w-full h-full">
+                        {% if image.is_spotlight %}
+                        <div class="absolute top-2 right-2 bg-yellow-400 text-white text-xs px-2 py-1 rounded-full shadow-sm" title="Spotlight Image">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="text-xs text-gray-500 truncate mb-2">
+                        {{ image.caption|default:"(No caption)" }}
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex justify-between items-center pt-2 border-t border-gray-200">
+                        <div class="text-gray-400 cursor-move hover:text-gray-600">
+                            <i class="fas fa-grip-horizontal"></i>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="{% url 'home:gallery_edit' image.pk %}" class="text-blue-600 hover:text-blue-800" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{% url 'home:gallery_delete' image.pk %}" class="inline" onsubmit="return confirm('Delete this image?');">
+                                {% csrf_token %}
+                                <button type="submit" class="text-red-600 hover:text-red-800" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12 text-gray-500">
+                <i class="fas fa-images text-4xl mb-4 text-gray-300"></i>
+                <p>No images in gallery.</p>
+                <a href="{% url 'home:gallery_add' %}" class="text-blue-600 hover:underline mt-2 inline-block">Upload your first photo</a>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<!-- SortableJS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sortableList = document.getElementById('sortable-gallery');
+        if (sortableList) {
+            new Sortable(sortableList, {
+                animation: 150,
+                ghostClass: 'bg-blue-50',
+                onEnd: function(evt) {
+                    const items = sortableList.querySelectorAll('div[data-id]');
+                    const order = Array.from(items).map(item => item.dataset.id);
+                    
+                    // Send new order to server
+                    fetch('{% url "home:gallery_reorder" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ order: order })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status !== 'success') {
+                            alert('Error updating order: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
