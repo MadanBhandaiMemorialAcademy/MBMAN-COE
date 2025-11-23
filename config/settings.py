@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -30,8 +31,12 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-default-key-change-me
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost,http://127.0.0.1").split(",")
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS", "https://mbcoe.mbman.edu.np,https://www.mbcoe.mbman.edu.np"
+).split(",")
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "CSRF_TRUSTED_ORIGINS", "https://mbcoe.mbman.edu.np,https://www.mbcoe.mbman.edu.np"
+).split(",")
 
 
 # Application definition
@@ -169,17 +174,21 @@ PASSWORD_HASHERS = [
 
 # Cloudinary Storage Configuration
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get("CLOUDINARY_CLOUD_NAME"),
-    'API_KEY': os.environ.get("CLOUDINARY_API_KEY"),
-    'API_SECRET': os.environ.get("CLOUDINARY_API_SECRET"),
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
 }
 
 # Use Cloudinary if configured, otherwise fallback to local storage
-if CLOUDINARY_STORAGE['CLOUD_NAME'] and CLOUDINARY_STORAGE['API_KEY'] and CLOUDINARY_STORAGE['API_SECRET']:
+if (
+    CLOUDINARY_STORAGE["CLOUD_NAME"]
+    and CLOUDINARY_STORAGE["API_KEY"]
+    and CLOUDINARY_STORAGE["API_SECRET"]
+):
     INSTALLED_APPS += ["cloudinary_storage", "cloudinary"]
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
     # Optional: Use Cloudinary for static files too (usually not recommended unless necessary)
-    # STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage' 
+    # STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
 else:
     # Local storage fallback
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"

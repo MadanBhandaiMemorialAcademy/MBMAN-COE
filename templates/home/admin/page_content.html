@@ -21,28 +21,30 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
-            <!-- Hero Section -->
+            <!-- Site Configuration (Name, etc.) -->
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-900">
-                        <i class="fas fa-image text-blue-600 mr-2"></i>Hero Section
+                        <i class="fas fa-cog text-gray-600 mr-2"></i>Site Configuration
                     </h3>
-                    <a href="{% url 'home:hero_edit' %}" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition">
+                    <a href="{% url 'home:site_config_edit' %}" class="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 transition">
                         <i class="fas fa-edit mr-1"></i>Edit
                     </a>
                 </div>
-                {% if hero %}
-                <div class="space-y-2 text-sm">
-                    <p><span class="font-semibold">Title:</span> {{ hero.title }}</p>
-                    <p><span class="font-semibold">Subtitle:</span> {{ hero.subtitle }}</p>
-                    <p><span class="font-semibold">CTA:</span> {{ hero.cta_text }}</p>
-                    {% if hero.background_image %}
-                    <img src="{{ hero.background_image.url }}" alt="Hero" class="w-full h-32 object-cover rounded-lg mt-2">
-                    {% endif %}
+                <p class="text-sm text-gray-600 mb-2">Manage college name, tagline, social links, and footer content.</p>
+            </div>
+
+            <!-- Hero Section (Redirect) -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">
+                        <i class="fas fa-images text-blue-600 mr-2"></i>Hero Slides
+                    </h3>
+                    <a href="{% url 'home:hero_list' %}" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition">
+                        <i class="fas fa-list mr-1"></i>Manage
+                    </a>
                 </div>
-                {% else %}
-                <p class="text-gray-500 text-sm">No hero section configured.</p>
-                {% endif %}
+                <p class="text-sm text-gray-600">Manage homepage hero carousel slides.</p>
             </div>
 
             <!-- Principal Message -->
