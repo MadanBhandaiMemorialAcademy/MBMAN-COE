@@ -6,12 +6,15 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "bcrypt>=5.0.0",
+    "dj-database-url>=3.0.1",
     "django>=5.2.8",
     "django-admin-ordering>=0.20.0",
     "django-admin-sortable2>=2.2.8",
+    "django-cloudinary-storage>=0.3.0",
     "fuzzywuzzy>=0.18.0",
     "nepali-datetime>=1.0.8.4",
     "pillow>=12.0.0",
+    "pymysql>=1.1.2",
     "python-dotenv>=1.2.1",
     "python-levenshtein>=0.27.3",
 ]
