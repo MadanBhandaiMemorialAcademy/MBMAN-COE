@@ -465,9 +465,24 @@ def event_delete(request, pk):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def faculty_list(request):
-    """List all faculty members"""
-    faculty = Faculty.objects.all().order_by("department", "display_order")
-    return render(request, "home/admin/faculty_list.html", {"faculty": faculty})
+    """List all faculty members grouped by tab/department"""
+    from .models import FacultyTab
+
+    tabs = FacultyTab.objects.all().order_by("display_order")
+    grouped_faculty = []
+    
+    for tab in tabs:
+        members = Faculty.objects.filter(department=tab.department_filter).order_by("display_order")
+        grouped_faculty.append({
+            "tab": tab,
+            "members": members
+        })
+        
+    # Handle faculty not in any active tab?
+    # For now, let's stick to the defined tabs as requested "shown under their own faculty section"
+    # If needed we could add an "Others" group.
+
+    return render(request, "home/admin/faculty_list.html", {"grouped_faculty": grouped_faculty})
 
 
 @login_required
@@ -519,6 +534,30 @@ def faculty_delete(request, pk):
     faculty.delete()
     messages.success(request, "Faculty member deleted successfully!")
     return redirect("home:faculty_list")
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def faculty_reorder(request):
+    """Reorder faculty members via AJAX"""
+    import json
+    from django.http import JsonResponse
+
+    try:
+        data = json.loads(request.body)
+        order = data.get("order", [])
+        
+        if not order:
+            return JsonResponse({"status": "error", "message": "No order provided"}, status=400)
+
+        # Update display_order for each item
+        for index, pk in enumerate(order):
+            Faculty.objects.filter(pk=pk).update(display_order=index)
+
+        return JsonResponse({"status": "success", "message": "Order updated successfully"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
 
 # ============= FACULTY TAB MANAGEMENT =============
