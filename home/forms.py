@@ -105,6 +105,8 @@ class EventForm(forms.ModelForm):
 
 
 class FacultyForm(forms.ModelForm):
+    department = forms.ChoiceField(label="Department")
+
     class Meta:
         model = Faculty
         fields = [
@@ -129,12 +131,6 @@ class FacultyForm(forms.ModelForm):
             ),
             "designation": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "e.g., HoD, IT Department"}
-            ),
-            "department": forms.TextInput(
-                attrs={
-                    "class": "form-input",
-                    "placeholder": "e.g., Computer Science, Agriculture",
-                }
             ),
             "qualification": forms.TextInput(
                 attrs={
@@ -174,6 +170,19 @@ class FacultyForm(forms.ModelForm):
                 }
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate department choices from FacultyTab
+        # Using department_filter as value, and name as label
+        tabs = FacultyTab.objects.filter(is_active=True)
+        choices = [(tab.department_filter, tab.name) for tab in tabs]
+        # If no tabs, maybe fallback or empty?
+        if not choices:
+            choices = [("", "No departments/tabs available")]
+        
+        self.fields["department"].choices = choices
+        self.fields["department"].widget.attrs.update({"class": "form-input"})
 
 
 class DepartmentForm(forms.ModelForm):
@@ -594,6 +603,9 @@ class SiteConfigurationForm(forms.ModelForm):
             "short_name",
             "tagline",
             "established_year",
+            "spotlight_title",
+            "spotlight_subtitle",
+            "spotlight_description",
             "about_us",
             "mission",
             "vision",
@@ -624,6 +636,15 @@ class SiteConfigurationForm(forms.ModelForm):
             ),
             "established_year": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "2067 BS"}
+            ),
+            "spotlight_title": forms.TextInput(
+                attrs={"class": "form-input", "placeholder": "In the Spotlight"}
+            ),
+            "spotlight_subtitle": forms.TextInput(
+                attrs={"class": "form-input", "placeholder": "Campus Life"}
+            ),
+            "spotlight_description": forms.Textarea(
+                attrs={"class": "form-input", "rows": 3, "placeholder": "Description"}
             ),
             "about_us": forms.Textarea(
                 attrs={"class": "form-input", "rows": 6, "placeholder": "About"}

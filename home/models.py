@@ -602,6 +602,20 @@ class SiteConfiguration(models.Model):
         max_length=20, blank=True, null=True, help_text="Year established (e.g., 2010 BS)"
     )
 
+    # Spotlight Section
+    spotlight_title = models.CharField(
+        max_length=200, default="In the Spotlight", help_text="Main title for spotlight section"
+    )
+    spotlight_subtitle = models.CharField(
+        max_length=200, default="Campus Life", help_text="Small eyebrow title above main title"
+    )
+    spotlight_description = models.TextField(
+        blank=True,
+        null=True,
+        default="Capturing moments of creativity, learning, and celebration at MBMAN.",
+        help_text="Description text for spotlight section",
+    )
+
     # About Section
     about_us = models.TextField(
         blank=True, null=True, help_text="About the college (for About page)"

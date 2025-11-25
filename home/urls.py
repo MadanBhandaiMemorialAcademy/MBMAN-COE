@@ -38,6 +38,7 @@ urlpatterns = [
     path("admin/faculty/add/", views.faculty_add, name="faculty_add"),
     path("admin/faculty/<int:pk>/edit/", views.faculty_edit, name="faculty_edit"),
     path("admin/faculty/<int:pk>/delete/", views.faculty_delete, name="faculty_delete"),
+    path("admin/faculty/reorder/", views.faculty_reorder, name="faculty_reorder"),
     # Faculty Tab Management
     path("admin/faculty-tabs/", views.faculty_tab_list, name="faculty_tab_list"),
     path("admin/faculty-tabs/add/", views.faculty_tab_add, name="faculty_tab_add"),
