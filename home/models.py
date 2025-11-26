@@ -451,7 +451,10 @@ class SiteLogo(models.Model):
 class ContactInfo(models.Model):
     """Model for contact information"""
 
-    phone = models.CharField(max_length=20)
+    phone = models.CharField(
+        max_length=100,
+        help_text="Enter phone numbers separated by commas (e.g., +977-021-540000, 98520xxxxx)",
+    )
     email = models.EmailField()
     address = models.TextField()
     facebook_url = models.URLField(blank=True, null=True)

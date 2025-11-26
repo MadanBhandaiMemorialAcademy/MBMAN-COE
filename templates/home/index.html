@@ -450,32 +450,49 @@
             <!-- Contact Info -->
             <div class="grid md:grid-cols-2 gap-8">
                 {% if contact_info %}
-                <div class="flex items-start space-x-5">
-                    <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-map-marker-alt text-mbman-blue text-xl"></i>
+                <div class="flex items-start space-x-5 group">
+                    {% if contact_info.map_url %}
+                    <a href="{{ contact_info.map_url }}" target="_blank" class="flex items-start w-full hover:bg-blue-50 p-2 rounded-lg transition -ml-2">
+                    {% else %}
+                    <div class="flex items-start w-full p-2 -ml-2">
+                    {% endif %}
+                        <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition">
+                            <i class="fas fa-map-marker-alt text-mbman-blue text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-bold text-gray-900 text-lg mb-2 group-hover:text-blue-700 transition">Visit Us</h4>
+                            <p class="text-gray-600">{{ contact_info.address|linebreaksbr }}</p>
+                        </div>
+                    {% if contact_info.map_url %}</a>{% else %}</div>{% endif %}
+                </div>
+
+                <div class="flex items-start space-x-5 group">
+                    <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-100 transition">
+                        <i class="fas fa-phone-alt text-mbman-blue text-xl group-hover:text-green-600 transition"></i>
                     </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900 text-lg mb-2">Visit Us</h4>
-                        <p class="text-gray-600">{{ contact_info.address|linebreaksbr }}</p>
+                    <div class="ml-4">
+                        <h4 class="font-bold text-gray-900 text-lg mb-2 group-hover:text-green-700 transition">Call Us</h4>
+                        <div class="flex flex-col space-y-1">
+                            {% for phone in contact_info.phone|split_comma %}
+                            <a href="tel:{{ phone }}" class="text-gray-600 hover:text-green-600 hover:underline transition">
+                                {{ phone }}
+                            </a>
+                            {% endfor %}
+                            <span class="text-gray-500 text-sm">Mon-Fri, 9:00 AM - 5:00 PM</span>
+                        </div>
                     </div>
                 </div>
-                <div class="flex items-start space-x-5">
-                    <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-phone-alt text-mbman-blue text-xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900 text-lg mb-2">Call Us</h4>
-                        <p class="text-gray-600">{{ contact_info.phone }}<br>Mon-Fri, 9:00 AM - 5:00 PM</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-5">
-                    <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-envelope text-mbman-blue text-xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-900 text-lg mb-2">Email Us</h4>
-                        <p class="text-gray-600">{{ contact_info.email }}</p>
-                    </div>
+
+                <div class="flex items-start space-x-5 group">
+                    <a href="mailto:{{ contact_info.email|default:'info@mbman.edu.np' }}" class="flex items-start w-full hover:bg-purple-50 p-2 rounded-lg transition -ml-2">
+                        <div class="w-14 h-14 bg-mbman-blue/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition">
+                            <i class="fas fa-envelope text-mbman-blue text-xl group-hover:text-purple-600 transition"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-bold text-gray-900 text-lg mb-2 group-hover:text-purple-700 transition">Email Us</h4>
+                            <p class="text-gray-600">{{ contact_info.email }}</p>
+                        </div>
+                    </a>
                 </div>
                 <!-- Map -->
                 {% if contact_info.map_embed_url %}

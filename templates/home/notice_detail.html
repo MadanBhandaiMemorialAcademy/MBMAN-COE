@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load custom_filters %}
 
 {% block title %}{{ notice.title }} - Sagarmatha Ordinary School{% endblock %}
 
 {% block content %}
 <!-- Page Header -->
-<section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12">
+<section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8">
     <div class="container mx-auto px-4">
         <div class="flex items-center text-blue-100 mb-4 text-sm">
             <a href="{% url 'home:index' %}" class="hover:text-white">Home</a>
@@ -66,24 +67,162 @@
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">
                             <i class="fas fa-paperclip mr-2"></i>Attachment
                         </h3>
-                        {% if notice.file.url|slice:"-4:" == ".pdf" or notice.file.url|slice:"-4:" == ".PDF" %}
-                        <div class="mb-4">
-                            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
-                                <p class="font-bold">Preview not available</p>
-                                <p>The PDF preview is not available on the local server. Please use the link below to open the PDF in a new tab.</p>
+                        
+                        {% if notice.file.url|lower|slice:"-4:" == ".pdf" %}
+                        <div class="mb-8 relative group">
+                            <!-- PDF Container -->
+                            <div id="pdf-viewer" 
+                                 data-url="{{ notice.file.url }}" 
+                                 data-worker-src="{% static 'js/lib/pdfjs/pdf.worker.min.js' %}"
+                                 class="w-full h-[80vh] overflow-y-auto overflow-x-hidden bg-gray-100 rounded-xl border border-gray-200 p-4 md:p-8 flex flex-col items-center shadow-inner scroll-smooth">
+                                <!-- Loading Spinner -->
+                                <div id="pdf-loading" class="flex flex-col items-center justify-center h-full w-full text-gray-500">
+                                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                                    <p>Loading Document...</p>
+                                </div>
+                                <!-- Canvases will be injected here -->
                             </div>
-                            <a href="{{ notice.file.url }}" target="_blank"
-                               class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
-                                <i class="far fa-file-pdf mr-2"></i>
-                                Open Document in New Tab
+
+                            <!-- Floating Controls -->
+                            <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900/90 backdrop-blur text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-6 transition-all duration-300 z-20">
+                                <div class="text-sm font-medium whitespace-nowrap">
+                                    <span id="page-indicator">Page 1</span> <span class="text-gray-400">/</span> <span id="page-total">--</span>
+                                </div>
+                                <div class="h-4 w-px bg-gray-700"></div>
+                                <div class="flex items-center gap-2">
+                                    <button id="zoom-out" class="p-1 hover:text-blue-400 transition" title="Zoom Out">
+                                        <i class="fas fa-minus text-xs"></i>
+                                    </button>
+                                    <button id="zoom-in" class="p-1 hover:text-blue-400 transition" title="Zoom In">
+                                        <i class="fas fa-plus text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PDF.js Scripts (Local) -->
+                        <script src="{% static 'js/lib/pdfjs/pdf.min.js' %}"></script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const container = document.getElementById('pdf-viewer');
+                                const url = container.getAttribute('data-url');
+                                const workerSrc = container.getAttribute('data-worker-src');
+                                
+                                const pdfjsLib = window['pdfjs-dist/build/pdf'];
+                                pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+
+                                let pdfDoc = null,
+                                    currentZoom = 1.0,
+                                    loadingDiv = document.getElementById('pdf-loading'),
+                                    pageTotalSpan = document.getElementById('page-total'),
+                                    pageIndicator = document.getElementById('page-indicator');
+
+                                // Intersection Observer to update page number on scroll
+                                const observer = new IntersectionObserver((entries) => {
+                                    entries.forEach(entry => {
+                                        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                                            const pageNum = entry.target.getAttribute('data-page-number');
+                                            pageIndicator.textContent = 'Page ' + pageNum;
+                                        }
+                                    });
+                                }, {
+                                    root: container,
+                                    threshold: 0.5
+                                });
+
+                                async function renderAllPages() {
+                                    // Clear container but keep loading if needed (though we usually clear before calling)
+                                    container.innerHTML = ''; 
+                                    
+                                    // Calculate "Fit Width" scale based on the first page
+                                    // We fetch page 1 just to get dimensions
+                                    const page1 = await pdfDoc.getPage(1);
+                                    const viewport1 = page1.getViewport({scale: 1});
+                                    
+                                    // Available width (minus padding: p-4 = 1rem*2 = 32px, md:p-8 = 64px)
+                                    // We'll use clientWidth which accounts for scrollbar
+                                    const availableWidth = container.clientWidth - (window.innerWidth >= 768 ? 64 : 32);
+                                    const baseScale = availableWidth / viewport1.width;
+                                    
+                                    const renderScale = baseScale * currentZoom;
+
+                                    for (let num = 1; num <= pdfDoc.numPages; num++) {
+                                        // Create wrapper for spacing/shadow
+                                        const wrapper = document.createElement('div');
+                                        wrapper.className = 'mb-6 transition-transform duration-200 origin-top';
+                                        wrapper.setAttribute('data-page-number', num);
+                                        
+                                        const canvas = document.createElement('canvas');
+                                        canvas.className = 'shadow-lg rounded bg-white';
+                                        canvas.style.maxWidth = '100%'; // Ensure it never overflows horizontally via CSS
+                                        
+                                        wrapper.appendChild(canvas);
+                                        container.appendChild(wrapper);
+                                        observer.observe(wrapper);
+
+                                        // Fetch and render page
+                                        pdfDoc.getPage(num).then(function(page) {
+                                            const viewport = page.getViewport({scale: renderScale});
+                                            const ctx = canvas.getContext('2d');
+                                            
+                                            canvas.height = viewport.height;
+                                            canvas.width = viewport.width;
+
+                                            const renderContext = {
+                                                canvasContext: ctx,
+                                                viewport: viewport
+                                            };
+                                            page.render(renderContext);
+                                        });
+                                    }
+                                }
+
+                                function onZoomIn() {
+                                    if (currentZoom < 3.0) {
+                                        currentZoom += 0.2;
+                                        renderAllPages();
+                                    }
+                                }
+                                
+                                function onZoomOut() {
+                                    if (currentZoom > 0.6) {
+                                        currentZoom -= 0.2;
+                                        renderAllPages();
+                                    }
+                                }
+
+                                document.getElementById('zoom-in').addEventListener('click', onZoomIn);
+                                document.getElementById('zoom-out').addEventListener('click', onZoomOut);
+
+                                // Load PDF
+                                pdfjsLib.getDocument(url).promise.then(async function(pdfDoc_) {
+                                    pdfDoc = pdfDoc_;
+                                    pageTotalSpan.textContent = pdfDoc.numPages;
+                                    await renderAllPages();
+                                }).catch(function(error) {
+                                    console.error('Error loading PDF:', error);
+                                    container.innerHTML = `
+                                        <div class="flex flex-col items-center justify-center h-full text-center p-8">
+                                            <div class="bg-red-100 p-4 rounded-full mb-4"><i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i></div>
+                                            <h3 class="text-lg font-bold text-gray-900 mb-2">Unable to load preview</h3>
+                                            <p class="text-gray-500 mb-6">Please download the file to view it.</p>
+                                            <a href="${url}" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Download PDF</a>
+                                        </div>`;
+                                });
+                            });
+                        </script>
+                        {% endif %}
+
+                        <div class="flex flex-wrap gap-4">
+                            <a href="{{ notice.file.url }}" target="_blank" class="inline-flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors duration-200 border border-gray-300">
+                                <i class="far fa-eye mr-2"></i>
+                                Open in New Tab
+                            </a>
+                            <a href="{{ notice.file.url }}" download class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm">
+                                <i class="fas fa-download mr-2"></i>
+                                Download File
                             </a>
                         </div>
-                        {% endif %}
-                        <a href="{{ notice.file.url }}" download 
-                           class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200">
-                            <i class="far fa-file-pdf mr-2"></i>
-                            Download Document
-                        </a>
                     </div>
                     {% endif %}
 

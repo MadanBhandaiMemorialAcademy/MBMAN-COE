@@ -53,16 +53,20 @@
                         </div>
 
                         <!-- Call Us -->
-                        <div class="flex items-start group">
-                            <a href="tel:{{ contact_info.phone|default:'+977-021-540000' }}" class="flex items-start w-full hover:bg-green-50 p-2 rounded-lg transition -ml-2">
-                                <div class="w-10 h-10 rounded-full bg-green-50 group-hover:bg-green-100 flex items-center justify-center flex-shrink-0 mt-1 transition">
-                                    <i class="fas fa-phone-alt text-green-600"></i>
+                        <div class="flex items-start group p-2 rounded-lg hover:bg-green-50 transition -ml-2">
+                            <div class="w-10 h-10 rounded-full bg-green-50 group-hover:bg-green-100 flex items-center justify-center flex-shrink-0 mt-1 transition">
+                                <i class="fas fa-phone-alt text-green-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-xs text-gray-500 uppercase font-semibold tracking-wider">Phone</p>
+                                <div class="mt-1 flex flex-col space-y-1">
+                                    {% for phone in contact_info.phone|split_comma %}
+                                    <a href="tel:{{ phone }}" class="text-gray-700 group-hover:text-green-700 font-medium hover:underline transition">
+                                        {{ phone }}
+                                    </a>
+                                    {% endfor %}
                                 </div>
-                                <div class="ml-4">
-                                    <p class="text-xs text-gray-500 uppercase font-semibold tracking-wider">Phone</p>
-                                    <p class="text-gray-700 mt-1 group-hover:text-green-700 transition">{{ contact_info.phone|default:"+977-021-540000" }}</p>
-                                </div>
-                            </a>
+                            </div>
                         </div>
 
                         <!-- Email Us -->
