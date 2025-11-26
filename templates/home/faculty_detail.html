@@ -34,13 +34,90 @@
                     </div>
                     {% endif %}
 
-                    <!-- Biography -->
+                    <!-- Biography or Details -->
                     {% if faculty.bio %}
                     <div class="mb-8">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">
                             <i class="fas fa-user-circle mr-2 text-blue-600"></i>About
                         </h3>
                         <p class="text-gray-700 text-lg leading-relaxed whitespace-pre-line">{{ faculty.bio }}</p>
+                    </div>
+                    {% else %}
+                    <!-- Contact Information (Moved to Main Content) -->
+                    <div class="mb-8">
+                        <div class="text-center mb-6">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ faculty.name }}</h3>
+                            {% if faculty.qualification %}
+                            <p class="text-blue-600 font-medium">{{ faculty.qualification }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                <i class="fas fa-briefcase text-blue-600 text-xl mr-4"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Position</p>
+                                    <p class="font-medium text-gray-900">{{ faculty.designation }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                <i class="fas fa-building text-blue-600 text-xl mr-4"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Department</p>
+                                    <p class="font-medium text-gray-900">{{ faculty.get_department_display }}</p>
+                                </div>
+                            </div>
+
+                            {% if faculty.email %}
+                            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                <i class="fas fa-envelope text-blue-600 text-xl mr-4"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Email</p>
+                                    <a href="mailto:{{ faculty.email }}" class="font-medium text-blue-600 hover:underline break-all">
+                                        {{ faculty.email }}
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if faculty.phone %}
+                            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                <i class="fas fa-phone text-blue-600 text-xl mr-4"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Phone</p>
+                                    <a href="tel:{{ faculty.phone }}" class="font-medium text-blue-600 hover:underline">
+                                        {{ faculty.phone }}
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if faculty.facebook_url or faculty.twitter_url or faculty.linkedin_url %}
+                            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                <i class="fas fa-share-alt text-blue-600 text-xl mr-4"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Social Links</p>
+                                    <div class="flex space-x-3 mt-1">
+                                        {% if faculty.facebook_url %}
+                                        <a href="{{ faculty.facebook_url }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-lg" title="Facebook">
+                                            <i class="fab fa-facebook"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if faculty.twitter_url %}
+                                        <a href="{{ faculty.twitter_url }}" target="_blank" class="text-blue-400 hover:text-blue-600 text-lg" title="Twitter/X">
+                                            <i class="fab fa-twitter"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if faculty.linkedin_url %}
+                                        <a href="{{ faculty.linkedin_url }}" target="_blank" class="text-blue-700 hover:text-blue-900 text-lg" title="LinkedIn">
+                                            <i class="fab fa-linkedin"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                     {% endif %}
 
@@ -57,7 +134,8 @@
 
             <!-- Sidebar -->
             <div class="lg:col-span-1">
-                <!-- Faculty Info Card -->
+                <!-- Faculty Info Card (Only show if Bio exists, otherwise it's in main content) -->
+                {% if faculty.bio %}
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">Contact Information</h3>
                     <div class="space-y-4">
@@ -136,6 +214,7 @@
                         {% endif %}
                     </div>
                 </div>
+                {% endif %}
 
                 <!-- Related Faculty -->
                 {% if related_faculty %}
