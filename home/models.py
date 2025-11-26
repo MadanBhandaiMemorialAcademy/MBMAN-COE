@@ -310,6 +310,11 @@ class Program(models.Model):
     ]
 
     code = models.CharField(max_length=10, unique=True)
+    degree_level = models.CharField(
+        max_length=50,
+        default="Bachelors",
+        help_text="Level of the degree (e.g., Bachelors, Masters, Ph.D.)",
+    )
     full_name = models.CharField(max_length=200)
     short_description = models.TextField()
     full_description = models.TextField()

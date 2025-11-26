@@ -518,6 +518,7 @@ class ProgramForm(forms.ModelForm):
         model = Program
         fields = [
             "code",
+            "degree_level",
             "full_name",
             "short_description",
             "full_description",
@@ -535,6 +536,12 @@ class ProgramForm(forms.ModelForm):
                 attrs={
                     "class": "form-input",
                     "placeholder": "e.g., BIT, AG, MBA",
+                }
+            ),
+            "degree_level": forms.TextInput(
+                attrs={
+                    "class": "form-input",
+                    "placeholder": "e.g., Bachelors, Masters",
                 }
             ),
             "full_name": forms.TextInput(

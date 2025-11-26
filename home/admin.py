@@ -120,13 +120,13 @@ class PrincipalMessageAdmin(admin.ModelAdmin):
 
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
-    list_display = ["code", "full_name", "duration", "is_active"]
-    list_filter = ["is_active"]
+    list_display = ["code", "degree_level", "full_name", "duration", "is_active"]
+    list_filter = ["is_active", "degree_level"]
     search_fields = ["code", "full_name", "short_description"]
     list_editable = ["is_active"]
 
     fieldsets = (
-        ("Basic Information", {"fields": ("code", "full_name", "duration")}),
+        ("Basic Information", {"fields": ("code", "degree_level", "full_name", "duration")}),
         ("Description", {"fields": ("short_description", "full_description")}),
         ("Media", {"fields": ("image", "brochure")}),
         ("Status", {"fields": ("is_active",)}),
