@@ -261,7 +261,13 @@ class HeroSectionForm(forms.ModelForm):
             "is_active",
         ]
         help_texts = {
-            'title': 'Use &lt;span class="text-transparent bg-clip-text bg-gradient-to-r from-mbman-gold to-yellow-300"&gt;Technology&lt;/span&gt; to colorize words.',
+            'title': 'Main large heading. Use &lt;span class="text-transparent bg-clip-text bg-gradient-to-r from-mbman-gold to-yellow-300"&gt;Word&lt;/span&gt; to make a word gold.',
+            'subtitle': 'Smaller text displayed below the title.',
+            'background_image': 'High-quality image (1920x1080 recommended).',
+            'background_overlay': 'Darkens the image to make text readable.',
+            'cta_text': 'Label for the main action button (e.g., "Apply Now"). Leave empty to hide.',
+            'cta_link': 'Where the button should link to (e.g., "#programs" or "https://example.com").',
+            'display_order': 'Lower numbers (1, 2, 3) appear first in the slideshow.',
         }
         widgets = {
             "title": forms.Textarea(
@@ -342,6 +348,7 @@ class ContactInfoForm(forms.ModelForm):
             "linkedin_url",
             "youtube_url",
             "map_embed_url",
+            "map_url",
             "is_active",
         ]
         widgets = {
@@ -370,9 +377,21 @@ class ContactInfoForm(forms.ModelForm):
                 attrs={
                     "class": "form-input",
                     "rows": 2,
-                    "placeholder": "Google Maps embed URL",
+                    "placeholder": "e.g. https://www.google.com/maps/embed?pb=...",
                 }
             ),
+            "map_url": forms.URLInput(
+                attrs={
+                    "class": "form-input",
+                    "placeholder": "e.g. https://maps.app.goo.gl/..."
+                }
+            ),
+        }
+        help_texts = {
+            "map_embed_url": "Go to Google Maps > Share > Embed a map > Copy HTML. Paste ONLY the URL inside src='...'. Example: https://www.google.com/maps/embed?pb=...",
+            "map_url": "Go to Google Maps > Share > Send a link > Copy Link. This is the link used when clicking 'Visit Us'.",
+            "phone": "Primary contact number displayed in header and contact page.",
+            "email": "Primary email address for inquiries.",
         }
 
 
@@ -602,6 +621,7 @@ class SiteConfigurationForm(forms.ModelForm):
             "college_name",
             "short_name",
             "tagline",
+            "wiki_url",
             "established_year",
             "spotlight_title",
             "spotlight_subtitle",
@@ -633,6 +653,9 @@ class SiteConfigurationForm(forms.ModelForm):
             ),
             "tagline": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "Excellence in Education"}
+            ),
+            "wiki_url": forms.URLInput(
+                attrs={"class": "form-input", "placeholder": "https://gist.github.com/..."}
             ),
             "established_year": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "2067 BS"}
@@ -676,6 +699,16 @@ class SiteConfigurationForm(forms.ModelForm):
             "meta_description": forms.Textarea(attrs={"class": "form-input", "rows": 3}),
             "meta_keywords": forms.Textarea(attrs={"class": "form-input", "rows": 2}),
             "is_active": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
+        }
+        help_texts = {
+            "college_name": "The main name displayed in the header and footer (e.g., School of Science & Technology).",
+            "short_name": "Acronym used in smaller spaces (e.g., SOST).",
+            "established_year": "Displayed in the footer or about section.",
+            "spotlight_title": "Heading for the photo spotlight section on the homepage.",
+            "spotlight_description": "Brief text describing the campus life photos.",
+            "footer_about": "A short paragraph (2-3 sentences) about the college shown in the footer.",
+            "meta_description": "Important for SEO. A summary of the website shown in Google search results.",
+            "meta_keywords": "Comma-separated keywords (e.g., engineering, nepal, bit, agriculture).",
         }
 
 

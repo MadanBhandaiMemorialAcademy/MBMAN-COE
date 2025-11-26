@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Faculty Members - {{ site_config.college_name }}{% endblock %}
+
+{% block inline_styles %}
+/* Fade In Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="bg-gray-50 py-12 md:py-16 relative">
+    <div class="container mx-auto px-4 text-center">
+        <h4 class="text-mbman-blue font-bold uppercase tracking-wider mb-3">Our Mentors</h4>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Faculty Directory</h1>
+        <p class="text-gray-600 max-w-2xl mx-auto text-lg">Meet the dedicated professors and staff who drive our academic excellence.</p>
+    </div>
+</div>
+
+<!-- Faculty Content -->
+<div class="bg-white py-12 min-h-screen">
+    <div class="container mx-auto px-4">
+        
+        <!-- Tabs -->
+        {% if faculty_tabs %}
+        <div class="flex justify-center mb-12">
+            <div class="inline-flex bg-gray-100 rounded-lg p-1 shadow-inner flex-wrap justify-center gap-1">
+                {% for tab in faculty_tabs %}
+                <button onclick="switchFacultyTab('{{ tab.slug }}')" id="btn-faculty-{{ tab.slug }}" class="px-6 py-3 text-sm md:text-base font-bold rounded-md transition-all {% if forloop.first %}bg-white text-mbman-blue shadow-sm{% else %}text-gray-600 hover:bg-gray-200{% endif %}">
+                    {{ tab.name }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Faculty Grid -->
+        {% for tab in faculty_tabs %}
+        {% with colors=tab.get_color_classes %}
+        <div id="tab-faculty-{{ tab.slug }}" class="{% if not forloop.first %}hidden {% endif %}animate-fade-in">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for faculty in faculty_by_tab|dict_get:tab.slug %}
+                <a href="{% url 'home:faculty_detail' faculty.pk %}" class="block bg-white rounded-xl border border-gray-100 hover:shadow-xl transition duration-300 p-6 text-center group">
+                    <div class="w-32 h-32 mx-auto rounded-full overflow-hidden mb-6 border-4 {{ colors.border }} {{ colors.hover_border }} transition duration-300">
+                        {% if faculty.photo %}
+                        <img src="{{ faculty.photo.url }}" alt="{{ faculty.name }}" class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full bg-gray-100 flex items-center justify-center text-4xl font-bold text-gray-400">
+                            {{ faculty.name.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 mb-1 group-hover:{{ colors.text }} transition">{{ faculty.name }}</h4>
+                    <p class="{{ colors.text }} font-medium text-sm mb-3">{{ faculty.designation }}</p>
+                    
+                    <!-- Social Links Mini -->
+                    <div class="flex justify-center space-x-3 mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        {% if faculty.email %}
+                        <span class="text-gray-400 hover:text-blue-600"><i class="fas fa-envelope"></i></span>
+                        {% endif %}
+                        {% if faculty.phone %}
+                        <span class="text-gray-400 hover:text-green-600"><i class="fas fa-phone"></i></span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% empty %}
+                <div class="col-span-full text-center py-12 text-gray-500">
+                    <i class="fas fa-users text-6xl text-gray-200 mb-4"></i>
+                    <p>No faculty members listed in {{ tab.name }} yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function switchFacultyTab(slug) {
+        // Hide all tabs
+        const allTabs = document.querySelectorAll('[id^="tab-faculty-"]');
+        const allButtons = document.querySelectorAll('[id^="btn-faculty-"]');
+        
+        allTabs.forEach(tab => tab.classList.add('hidden'));
+        allButtons.forEach(btn => {
+            btn.classList.remove('bg-white', 'text-mbman-blue', 'shadow-sm');
+            btn.classList.add('text-gray-600', 'hover:bg-gray-200');
+        });
+        
+        // Show selected tab
+        const selectedTab = document.getElementById('tab-faculty-' + slug);
+        const selectedButton = document.getElementById('btn-faculty-' + slug);
+        
+        if (selectedTab) selectedTab.classList.remove('hidden');
+        if (selectedButton) {
+            selectedButton.classList.remove('text-gray-600', 'hover:bg-gray-200');
+            selectedButton.classList.add('bg-white', 'text-mbman-blue', 'shadow-sm');
+        }
+    }
+</script>
+{% endblock %}

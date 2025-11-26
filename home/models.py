@@ -459,6 +459,9 @@ class ContactInfo(models.Model):
     linkedin_url = models.URLField(blank=True, null=True)
     youtube_url = models.URLField(blank=True, null=True)
     map_embed_url = models.TextField(blank=True, null=True)
+    map_url = models.URLField(
+        blank=True, null=True, help_text="Google Maps link for 'Visit Us' button"
+    )
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -597,6 +600,9 @@ class SiteConfiguration(models.Model):
         max_length=300,
         default="Excellence in Education",
         help_text="College tagline or motto",
+    )
+    wiki_url = models.URLField(
+        blank=True, null=True, help_text="URL for the Admin Wiki/Documentation (e.g., Gist link)."
     )
     established_year = models.CharField(
         max_length=20, blank=True, null=True, help_text="Year established (e.g., 2010 BS)"
