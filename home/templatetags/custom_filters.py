@@ -34,3 +34,10 @@ def split_nepali_date(date_string):
     if len(parts) == 3:
         return {'day': parts[0], 'month': parts[1].replace(',', ''), 'year': parts[2]}
     return {'day': '', 'month': '', 'year': ''}
+
+@register.filter
+def split_comma(value):
+    """Split a string by commas"""
+    if isinstance(value, str):
+        return [x.strip() for x in value.split(',')]
+    return value
