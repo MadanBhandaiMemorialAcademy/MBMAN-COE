@@ -640,8 +640,8 @@ class SiteConfiguration(models.Model):
     )
     footer_text = models.CharField(
         max_length=200,
-        default="© 2025 All rights reserved.",
-        help_text="Copyright text",
+        default="Madan Bhandari Memorial Academy Nepal. All rights reserved.",
+        help_text="Full copyright text (e.g., 'My College. All rights reserved.'). Year and © symbol are added automatically.",
     )
 
     # Social Media Links

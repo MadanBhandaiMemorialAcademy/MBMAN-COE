@@ -707,6 +707,7 @@ class SiteConfigurationForm(forms.ModelForm):
             "spotlight_title": "Heading for the photo spotlight section on the homepage.",
             "spotlight_description": "Brief text describing the campus life photos.",
             "footer_about": "A short paragraph (2-3 sentences) about the college shown in the footer.",
+            "footer_text": "Full copyright text (e.g., 'My College. All rights reserved.'). Year and © symbol are added automatically.",
             "meta_description": "Important for SEO. A summary of the website shown in Google search results.",
             "meta_keywords": "Comma-separated keywords (e.g., engineering, nepal, bit, agriculture).",
         }
