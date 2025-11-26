@@ -294,6 +294,54 @@ def notice_detail(request, pk):
     return render(request, "home/notice_detail.html", context)
 
 
+def programs_page(request):
+    """List all academic programs"""
+    programs = Program.objects.filter(is_active=True).order_by("display_order")
+    
+    # Check for graduate programs
+    has_graduate_programs = (
+        programs.filter(
+            models.Q(full_name__icontains="master")
+            | models.Q(full_name__icontains="graduate")
+            | models.Q(full_name__icontains="phd")
+            | models.Q(full_name__icontains="doctoral")
+        )
+        .exists()
+    )
+
+    context = {
+        "programs": programs,
+        "has_graduate_programs": has_graduate_programs,
+    }
+    return render(request, "home/programs.html", context)
+
+
+def faculty_page(request):
+    """List all faculty members organized by tabs"""
+    from .models import FacultyTab
+    
+    faculty_tabs = FacultyTab.objects.filter(is_active=True).order_by("display_order")
+    faculty_by_tab = {}
+    for tab in faculty_tabs:
+        faculty_by_tab[tab.slug] = Faculty.objects.filter(
+            department=tab.department_filter, is_active=True
+        ).order_by("display_order")
+
+    context = {
+        "faculty_tabs": faculty_tabs,
+        "faculty_by_tab": faculty_by_tab,
+    }
+    return render(request, "home/faculty.html", context)
+
+
+def contact_page(request):
+    """Contact Us page - Info only"""
+    context = {
+        "contact_info": ContactInfo.objects.filter(is_active=True).first(),
+    }
+    return render(request, "home/contact.html", context)
+
+
 # ============= ADMIN DASHBOARD VIEWS =============
 
 
@@ -301,7 +349,10 @@ def notice_detail(request, pk):
 @user_passes_test(lambda u: u.is_staff)
 def admin_dashboard(request):
     """Admin dashboard view - requires staff permission"""
+    from .models import SiteConfiguration
+    
     context = {
+        "site_config": SiteConfiguration.objects.filter(is_active=True).first(),
         "total_notices": Notice.objects.count(),
         "total_events": Event.objects.count(),
         "total_faculty": Faculty.objects.count(),

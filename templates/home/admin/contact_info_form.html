@@ -73,11 +73,20 @@
                     </div>
                 </div>
 
+                <!-- Map Embed URL -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.map_embed_url.label }}</label>
                     {{ form.map_embed_url }}
-                    <p class="mt-1 text-xs text-gray-500">Google Maps embed URL</p>
                     {% if form.map_embed_url.errors %}<p class="mt-1 text-sm text-red-600">{{ form.map_embed_url.errors.0 }}</p>{% endif %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.map_embed_url.help_text }}</p>
+                </div>
+
+                <!-- Map Link URL -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.map_url.label }}</label>
+                    {{ form.map_url }}
+                    {% if form.map_url.errors %}<p class="mt-1 text-sm text-red-600">{{ form.map_url.errors.0 }}</p>{% endif %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.map_url.help_text }}</p>
                 </div>
 
                 <div class="flex items-center">

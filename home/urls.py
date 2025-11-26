@@ -17,6 +17,10 @@ urlpatterns = [
     # Public Event Pages
     path("events/", views.events_page, name="events_page"),
     path("events/<int:pk>/", views.event_detail, name="event_detail"),
+    # Public Pages
+    path("programs/", views.programs_page, name="programs"),
+    path("faculty/", views.faculty_page, name="faculty"),
+    path("contact/", views.contact_page, name="contact"),
     # Public Gallery
     path("gallery/", views.gallery_page, name="gallery"),
     path("gallery/<int:pk>/", views.gallery_album_detail, name="gallery_album_detail"),

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Academic Programs - {{ site_config.college_name }}{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="bg-mbman-light py-12 md:py-16 relative overflow-hidden">
+    <div class="container mx-auto px-4 relative z-10 text-center">
+        <h4 class="text-mbman-blue font-bold uppercase tracking-wider mb-3">Academic Excellence</h4>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Our Programs</h1>
+        <p class="text-gray-600 max-w-2xl mx-auto text-lg">Discover the specialized engineering and technology courses we offer.</p>
+    </div>
+</div>
+
+<!-- Programs Grid -->
+<div class="bg-white py-12 min-h-screen">
+    <div class="container mx-auto px-4">
+        <div class="grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto">
+            {% for program in programs %}
+            {% with colors=program.get_color_classes %}
+            <div class="group bg-white rounded-[2rem] overflow-hidden shadow-xl hover:shadow-2xl transition duration-500 border border-gray-100">
+                <div class="h-64 relative overflow-hidden">
+                    <div class="absolute inset-0 {{ colors.bg_light }} {{ colors.bg_hover }} transition z-10"></div>
+                    {% if program.image %}
+                    <img src="{{ program.image.url }}" alt="{{ program.code }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-700">
+                    {% else %}
+                    <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="{{ program.code }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-700">
+                    {% endif %}
+                    <div class="absolute bottom-6 left-6 z-20">
+                        <span class="px-4 py-2 {{ colors.bg }} text-white text-sm font-bold rounded-lg shadow-sm">{{ program.duration }}</span>
+                    </div>
+                </div>
+                <div class="p-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-3xl font-bold text-gray-900 mb-2">{{ program.code }}</h3>
+                            <p class="{{ colors.text }} font-medium">{{ program.full_name }}</p>
+                        </div>
+                        <i class="{{ program.icon_class }} {{ colors.icon_text }} text-5xl opacity-20 group-hover:opacity-100 transition"></i>
+                    </div>
+                    <p class="text-gray-600 mb-8 leading-relaxed">
+                        {{ program.short_description }}
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        {% for feature in program.features.all %}
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="{{ feature.icon }} {{ colors.feature_icon }} mr-2"></i>{{ feature.feature_text }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'home:curriculum_page' program.url_slug %}" class="inline-flex items-center justify-center w-full py-4 bg-gray-50 {{ colors.text }} font-bold rounded-xl {{ colors.hover_bg }} hover:text-white transition duration-300">
+                        View Curriculum
+                    </a>
+                </div>
+            </div>
+            {% endwith %}
+            {% empty %}
+            <div class="col-span-2 text-center py-12 text-gray-500">
+                No programs found.
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Graduate Programs Section -->
+        {% if has_graduate_programs %}
+        <div class="mt-20 text-center">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Graduate Programs</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto mb-8">
+                We also offer Master's and Ph.D. programs for advanced research and specialization.
+            </p>
+            <div class="inline-block bg-purple-50 text-purple-700 px-6 py-4 rounded-lg border border-purple-100">
+                Please contact the administration for more details on graduate admissions.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

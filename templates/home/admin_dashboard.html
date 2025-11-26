@@ -30,6 +30,22 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
+        <!-- Wiki Alert -->
+        {% if site_config.wiki_url %}
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg shadow-sm flex items-center justify-between">
+            <div class="flex items-center">
+                <i class="fas fa-book-reader text-blue-500 text-xl mr-3"></i>
+                <div>
+                    <p class="text-sm text-blue-700 font-bold">Need help managing the site?</p>
+                    <p class="text-xs text-blue-600">Check out the Administrator User Guide for step-by-step instructions.</p>
+                </div>
+            </div>
+            <a href="{{ site_config.wiki_url }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded hover:bg-blue-700 transition">
+                Open Guide <i class="fas fa-external-link-alt ml-1"></i>
+            </a>
+        </div>
+        {% endif %}
+
         <!-- Messages -->
         {% if messages %}
         <div class="mb-6 space-y-2">
