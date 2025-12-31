@@ -445,9 +445,8 @@ class CurriculumForm(forms.ModelForm):
 class CurriculumSemesterForm(forms.ModelForm):
     class Meta:
         model = CurriculumSemester
-        fields = ["curriculum", "semester_number", "description", "display_order"]
+        fields = ["semester_number", "description", "display_order"]
         widgets = {
-            "curriculum": forms.Select(attrs={"class": "form-input"}),
             "semester_number": forms.NumberInput(
                 attrs={"class": "form-input", "min": "1", "max": "8"}
             ),
@@ -467,9 +466,8 @@ class CurriculumSemesterForm(forms.ModelForm):
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ["semester", "code", "title", "credits", "description", "display_order"]
+        fields = ["code", "title", "credits", "description", "display_order"]
         widgets = {
-            "semester": forms.Select(attrs={"class": "form-input"}),
             "code": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "e.g., BIT101"}
             ),

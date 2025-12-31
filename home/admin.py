@@ -196,10 +196,6 @@ class CurriculumAdmin(admin.ModelAdmin):
         ("Status", {"fields": ("is_active",)}),
     )
 
-    def has_add_permission(self, request):
-        # Only allow BIT and AG
-        return Curriculum.objects.count() < 2
-
 
 @admin.register(CurriculumSemester)
 class CurriculumSemesterAdmin(admin.ModelAdmin):
