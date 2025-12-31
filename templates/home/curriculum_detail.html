@@ -13,10 +13,11 @@
     </div>
     {% else %}
     <div class="absolute inset-0 {{ program.get_color_classes.bg }}">
-        <div class="absolute inset-0 opacity-10" style="background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);"></div>
+        <div class="absolute inset-0 opacity-10"
+            style="background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);"></div>
     </div>
     {% endif %}
-    
+
     <div class="relative z-10 h-full flex items-center">
         <div class="container mx-auto px-4">
             <div class="max-w-4xl">
@@ -53,15 +54,15 @@
 <section class="py-16">
     <div class="container mx-auto px-4">
         <h2 class="text-4xl font-bold text-center text-gray-900 mb-12">Curriculum Structure</h2>
-        
+
         {% if semesters %}
         <!-- Semester Tabs -->
         <div class="max-w-6xl mx-auto">
             <div class="flex overflow-x-auto space-x-2 mb-8 pb-2 scrollbar-hide">
                 {% for semester in semesters %}
-                <button onclick="switchTab('semester-{{ semester.semester_number }}')" 
-                        id="tab-semester-{{ semester.semester_number }}"
-                        class="semester-tab px-6 py-3 rounded-lg font-semibold whitespace-nowrap transition {% if forloop.first %}{{ program.get_color_classes.bg }} text-white{% else %}bg-gray-200 text-gray-700 hover:bg-gray-300{% endif %}">
+                <button type="button" onclick="switchTab('semester-{{ semester.semester_number }}')"
+                    id="tab-semester-{{ semester.semester_number }}"
+                    class="semester-tab px-6 py-3 rounded-lg font-semibold whitespace-nowrap transition {% if forloop.first %}{{ program.get_color_classes.bg }} text-white{% else %}bg-gray-200 text-gray-700 hover:bg-gray-300{% endif %}">
                     Semester {{ semester.semester_number }}
                 </button>
                 {% endfor %}
@@ -69,9 +70,9 @@
 
             <!-- Semester Content -->
             {% for semester in semesters %}
-            <div id="content-semester-{{ semester.semester_number }}" 
-                 class="semester-content {% if not forloop.first %}hidden{% endif %} animate-fade-in">
-                
+            <div id="content-semester-{{ semester.semester_number }}"
+                class="semester-content {% if not forloop.first %}hidden{% endif %} animate-fade-in">
+
                 {% if semester.description %}
                 <p class="text-gray-600 mb-6 text-center">{{ semester.description }}</p>
                 {% endif %}
@@ -124,7 +125,8 @@
             {% for prospect in career_prospects %}
             <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
                 <div class="flex items-start">
-                    <div class="{{ program.get_color_classes.bg }} text-white w-12 h-12 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <div
+                        class="{{ program.get_color_classes.bg }} text-white w-12 h-12 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
                         <i class="{{ prospect.icon }} text-xl"></i>
                     </div>
                     <div>
@@ -138,44 +140,81 @@
 </section>
 {% endif %}
 
-<script>
-function switchTab(semesterId) {
-    // Hide all content
-    document.querySelectorAll('.semester-content').forEach(content => {
-        content.classList.add('hidden');
-    });
-    
-    // Reset all tabs
-    document.querySelectorAll('.semester-tab').forEach(tab => {
-        tab.classList.remove('{{ program.get_color_classes.bg }}', 'text-white');
-        tab.classList.add('bg-gray-200', 'text-gray-700');
-    });
-    
-    // Show selected content
-    document.getElementById('content-' + semesterId).classList.remove('hidden');
-    
-    // Highlight selected tab
-    const selectedTab = document.getElementById('tab-' + semesterId);
-    selectedTab.classList.remove('bg-gray-200', 'text-gray-700');
-    selectedTab.classList.add('{{ program.get_color_classes.bg }}', 'text-white');
-}
-</script>
+
 
 <style>
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
-}
-.scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.animate-fade-in {
-    animation: fadeIn 0.3s ease-out forwards;
-}
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function switchTab(semesterId) {
+        try {
+            console.log('Switching to tab:', semesterId);
+            
+            // Get active classes safely
+            const activeClassString = '{{ program.get_color_classes.bg }}';
+            const activeClasses = activeClassString.split(' ').filter(c => c.trim().length > 0);
+
+            // Hide all content
+            const contents = document.querySelectorAll('.semester-content');
+            contents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Reset all tabs
+            const tabs = document.querySelectorAll('.semester-tab');
+            tabs.forEach(tab => {
+                // Safely remove active classes
+                if (activeClasses.length > 0) {
+                    tab.classList.remove(...activeClasses);
+                }
+                tab.classList.remove('text-white');
+                tab.classList.add('bg-gray-200', 'text-gray-700');
+            });
+
+            // Show selected content
+            const contentEl = document.getElementById('content-' + semesterId);
+            if (contentEl) {
+                contentEl.classList.remove('hidden');
+            }
+
+            // Highlight selected tab
+            const tabEl = document.getElementById('tab-' + semesterId);
+            if (tabEl) {
+                tabEl.classList.remove('bg-gray-200', 'text-gray-700');
+                if (activeClasses.length > 0) {
+                    tabEl.classList.add(...activeClasses);
+                }
+                tabEl.classList.add('text-white');
+            }
+        } catch (e) {
+            console.error('Error switching tab:', e);
+        }
+    }
+</script>
 {% endblock %}

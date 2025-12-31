@@ -38,6 +38,8 @@ from .models import (
     SiteLogo,
 )
 
+from .views_bulk import semester_bulk_add, course_bulk_add
+
 
 def index(request):
     """Homepage view with dynamic content"""
@@ -155,24 +157,14 @@ def curriculum_page(request, slug):
         "career_prospects": career_prospects,
     }
 
-    # Determine template based on program code or use generic
-    template_map = {
-        "BIT": "home/bit.html",
-        "AG": "home/agriculture.html",
+    context = {
+        "program": program,
+        "curriculum": curriculum,
+        "semesters": semesters,
+        "career_prospects": career_prospects,
     }
-    template = template_map.get(program.code, "home/curriculum_detail.html")
 
-    return render(request, template, context)
-
-
-def bit(request):
-    """BIT curriculum page - redirect to dynamic view"""
-    return curriculum_page(request, "bit")
-
-
-def agriculture(request):
-    """Agriculture curriculum page - redirect to dynamic view"""
-    return curriculum_page(request, "agriculture")
+    return render(request, "home/curriculum_detail.html", context)
 
 
 def faculty_detail(request, pk):
