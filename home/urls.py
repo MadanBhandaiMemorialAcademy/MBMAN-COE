@@ -1,14 +1,19 @@
 from django.urls import path
 
 from . import views
+from .views_bulk import (
+    semester_bulk_add, 
+    course_bulk_add, 
+    semester_bulk_delete, 
+    course_bulk_delete
+)
 
 app_name = "home"
 
 urlpatterns = [
     path("", views.index, name="index"),
     # Legacy URLs for backwards compatibility
-    path("programs/bit/", views.bit, name="bit"),
-    path("programs/agriculture/", views.agriculture, name="agriculture"),
+
     path("faculty/<int:pk>/", views.faculty_detail, name="faculty_detail"),
     path("account/manage/", views.manage_account, name="manage_account"),
     # Public Notice Pages
@@ -102,6 +107,16 @@ urlpatterns = [
         name="semester_add",
     ),
     path(
+        "admin/curriculum/<int:curriculum_pk>/semester/bulk-add/",
+        semester_bulk_add,
+        name="semester_bulk_add",
+    ),
+    path(
+        "admin/curriculum/<int:curriculum_pk>/semester/bulk-delete/",
+        semester_bulk_delete,
+        name="semester_bulk_delete",
+    ),
+    path(
         "admin/curriculum/semester/<int:pk>/edit/",
         views.semester_edit,
         name="semester_edit",
@@ -115,6 +130,16 @@ urlpatterns = [
         "admin/curriculum/semester/<int:semester_pk>/course/add/",
         views.course_add,
         name="course_add",
+    ),
+    path(
+        "admin/curriculum/semester/<int:semester_pk>/course/bulk-add/",
+        course_bulk_add,
+        name="course_bulk_add",
+    ),
+    path(
+        "admin/curriculum/semester/<int:semester_pk>/course/bulk-delete/",
+        course_bulk_delete,
+        name="course_bulk_delete",
     ),
     path("admin/curriculum/course/<int:pk>/edit/", views.course_edit, name="course_edit"),
     path(

@@ -5,29 +5,35 @@
 
 {% block content %}
 <div class="min-h-screen bg-gray-100 py-8">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-6 flex justify-between items-center">
-        <div>
-            <h2 class="text-3xl font-bold text-gray-900">Manage Curriculum</h2>
-            <p class="text-gray-600 mt-2">Add, edit, and manage curriculum pages with semesters and courses</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-6 flex justify-between items-center">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900">Manage Curriculum</h2>
+                <p class="text-gray-600 mt-2">Add, edit, and manage curriculum pages with semesters and courses</p>
+            </div>
+            <a href="{% url 'home:curriculum_add' %}"
+                class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold shadow-md">
+                <i class="fas fa-plus mr-2"></i>Add New Curriculum
+            </a>
         </div>
-        <a href="{% url 'home:curriculum_add' %}" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold shadow-md">
-            <i class="fas fa-plus mr-2"></i>Add New Curriculum
-        </a>
-    </div>
 
-    {% if curriculums %}
+        {% if curriculums %}
         {% for curriculum in curriculums %}
         <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-            <div class="bg-gradient-to-r from-purple-50 to-purple-100 px-6 py-4 border-b border-purple-200 flex justify-between items-center">
+            <div
+                class="bg-gradient-to-r from-purple-50 to-purple-100 px-6 py-4 border-b border-purple-200 flex justify-between items-center">
                 <h3 class="text-xl font-bold text-gray-900">{{ curriculum.program }} Curriculum</h3>
                 <div class="flex items-center gap-3">
-                    <a href="{% url 'home:curriculum_edit' curriculum.pk %}" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold text-sm">
+                    <a href="{% url 'home:curriculum_edit' curriculum.pk %}"
+                        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold text-sm">
                         <i class="fas fa-edit mr-1"></i>Edit Details
                     </a>
-                    <form method="post" action="{% url 'home:curriculum_delete' curriculum.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{ curriculum.program }} curriculum? This will also delete all semesters and courses.')">
+                    <form method="post" action="{% url 'home:curriculum_delete' curriculum.pk %}"
+                        style="display: inline;"
+                        onsubmit="return confirm('Are you sure you want to delete {{ curriculum.program }} curriculum? This will also delete all semesters and courses.')">
                         {% csrf_token %}
-                        <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-sm">
+                        <button type="submit"
+                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-sm">
                             <i class="fas fa-trash mr-1"></i>Delete
                         </button>
                     </form>
@@ -59,105 +65,147 @@
 
                 <div class="border-t border-gray-200 pt-6">
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-lg font-bold text-gray-900">Semesters <span class="text-gray-500 text-sm font-normal">({{ curriculum.semesters.count }})</span></h4>
-                        <a href="{% url 'home:semester_add' curriculum.pk %}" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold text-sm">
-                            <i class="fas fa-plus mr-1"></i>Add Semester
-                        </a>
+                        <h4 class="text-lg font-bold text-gray-900">Semesters <span
+                                class="text-gray-500 text-sm font-normal">({{ curriculum.semesters.count }})</span></h4>
+                        <div class="flex gap-2">
+                            <a href="{% url 'home:semester_bulk_add' curriculum.pk %}"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm">
+                                <i class="fas fa-layer-group mr-1"></i>Bulk Add
+                            </a>
+                            <a href="{% url 'home:semester_bulk_delete' curriculum.pk %}"
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-sm">
+                                <i class="fas fa-trash-alt mr-1"></i>Bulk Delete
+                            </a>
+                            <a href="{% url 'home:semester_add' curriculum.pk %}"
+                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold text-sm">
+                                <i class="fas fa-plus mr-1"></i>Add Semester
+                            </a>
+                        </div>
                     </div>
 
                     {% if curriculum.semesters.all %}
-                        <div class="space-y-3" id="accordion{{ curriculum.pk }}">
-                            {% for semester in curriculum.semesters.all %}
-                            <div class="border border-gray-200 rounded-lg overflow-hidden">
-                                <details class="group">
-                                    <summary class="flex justify-between items-center px-4 py-3 bg-gray-50 hover:bg-gray-100 cursor-pointer">
-                                        <span class="font-semibold text-gray-900">
-                                            Semester {{ semester.semester_number }}
-                                            {% if semester.description %} - <span class="text-gray-600 font-normal">{{ semester.description|truncatewords:10 }}</span>{% endif %}
-                                        </span>
-                                        <i class="fas fa-chevron-down group-open:rotate-180 transition-transform text-gray-500"></i>
-                                    </summary>
-                                    <div class="p-4 bg-white">
-                                        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
-                                            <div class="flex gap-2">
-                                                <a href="{% url 'home:semester_edit' semester.pk %}" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition font-medium text-sm">
-                                                    <i class="fas fa-edit mr-1"></i>Edit Semester
-                                                </a>
-                                                <a href="{% url 'home:course_add' semester.pk %}" class="px-3 py-1.5 bg-green-100 text-green-700 rounded hover:bg-green-200 transition font-medium text-sm">
-                                                    <i class="fas fa-plus mr-1"></i>Add Course
-                                                </a>
-                                            </div>
-                                            <form method="post" action="{% url 'home:semester_delete' semester.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this semester and all its courses?');">
-                                                {% csrf_token %}
-                                                <button type="submit" class="px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition font-medium text-sm">
-                                                    <i class="fas fa-trash mr-1"></i>Delete Semester
-                                                </button>
-                                            </form>
+                    <div class="space-y-3" id="accordion{{ curriculum.pk }}">
+                        {% for semester in curriculum.semesters.all %}
+                        <div class="border border-gray-200 rounded-lg overflow-hidden">
+                            <details class="group">
+                                <summary
+                                    class="flex justify-between items-center px-4 py-3 bg-gray-50 hover:bg-gray-100 cursor-pointer">
+                                    <span class="font-semibold text-gray-900">
+                                        Semester {{ semester.semester_number }}
+                                        {% if semester.description %} - <span class="text-gray-600 font-normal">{{ semester.description|truncatewords:10 }}</span>{% endif %}
+                                    </span>
+                                    <i
+                                        class="fas fa-chevron-down group-open:rotate-180 transition-transform text-gray-500"></i>
+                                </summary>
+                                <div class="p-4 bg-white">
+                                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
+                                        <div class="flex gap-2">
+                                            <a href="{% url 'home:semester_edit' semester.pk %}"
+                                                class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition font-medium text-sm">
+                                                <i class="fas fa-edit mr-1"></i>Edit Semester
+                                            </a>
+                                            <a href="{% url 'home:course_bulk_add' semester.pk %}"
+                                                class="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition font-medium text-sm">
+                                                <i class="fas fa-layer-group mr-1"></i>Bulk Add
+                                            </a>
+                                            <a href="{% url 'home:course_bulk_delete' semester.pk %}"
+                                                class="px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition font-medium text-sm">
+                                                <i class="fas fa-trash-alt mr-1"></i>Bulk Delete
+                                            </a>
+                                            <a href="{% url 'home:course_add' semester.pk %}"
+                                                class="px-3 py-1.5 bg-green-100 text-green-700 rounded hover:bg-green-200 transition font-medium text-sm">
+                                                <i class="fas fa-plus mr-1"></i>Add Course
+                                            </a>
                                         </div>
-
-                                        {% if semester.courses.all %}
-                                        <div class="overflow-x-auto">
-                                            <table class="min-w-full divide-y divide-gray-200">
-                                                <thead class="bg-gray-50">
-                                                    <tr>
-                                                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Code</th>
-                                                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Title</th>
-                                                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Credits</th>
-                                                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="bg-white divide-y divide-gray-200">
-                                                    {% for course in semester.courses.all %}
-                                                    <tr class="hover:bg-gray-50">
-                                                        <td class="px-3 py-2 whitespace-nowrap font-mono text-sm">{{ course.code }}</td>
-                                                        <td class="px-3 py-2">{{ course.title }}</td>
-                                                        <td class="px-3 py-2 whitespace-nowrap text-gray-600">{{ course.credits }}</td>
-                                                        <td class="px-3 py-2 whitespace-nowrap">
-                                                            <a href="{% url 'home:course_edit' course.pk %}" class="text-blue-600 hover:text-blue-800 font-medium mr-3 text-sm">
-                                                                <i class="fas fa-edit mr-1"></i>Edit
-                                                            </a>
-                                                            <form method="post" action="{% url 'home:course_delete' course.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                                                {% csrf_token %}
-                                                                <button type="submit" class="text-red-600 hover:text-red-800 font-medium text-sm">
-                                                                    <i class="fas fa-trash mr-1"></i>Delete
-                                                                </button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        {% else %}
-                                        <p class="text-gray-500 italic">No courses added yet.</p>
-                                        {% endif %}
+                                        <form method="post" action="{% url 'home:semester_delete' semester.pk %}"
+                                            style="display: inline;"
+                                            onsubmit="return confirm('Are you sure you want to delete this semester and all its courses?');">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                class="px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition font-medium text-sm">
+                                                <i class="fas fa-trash mr-1"></i>Delete Semester
+                                            </button>
+                                        </form>
                                     </div>
-                                </details>
-                            </div>
-                            {% endfor %}
+
+                                    {% if semester.courses.all %}
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th
+                                                        class="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                        Code</th>
+                                                    <th
+                                                        class="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                        Title</th>
+                                                    <th
+                                                        class="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                        Credits</th>
+                                                    <th
+                                                        class="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                        Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                                {% for course in semester.courses.all %}
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-3 py-2 whitespace-nowrap font-mono text-sm">{{ course.code }}</td>
+                                                    <td class="px-3 py-2">{{ course.title }}</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-gray-600">{{ course.credits }}</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap">
+                                                        <a href="{% url 'home:course_edit' course.pk %}"
+                                                            class="text-blue-600 hover:text-blue-800 font-medium mr-3 text-sm">
+                                                            <i class="fas fa-edit mr-1"></i>Edit
+                                                        </a>
+                                                        <form method="post"
+                                                            action="{% url 'home:course_delete' course.pk %}"
+                                                            style="display: inline;"
+                                                            onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                                            {% csrf_token %}
+                                                            <button type="submit"
+                                                                class="text-red-600 hover:text-red-800 font-medium text-sm">
+                                                                <i class="fas fa-trash mr-1"></i>Delete
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <p class="text-gray-500 italic">No courses added yet.</p>
+                                    {% endif %}
+                                </div>
+                            </details>
                         </div>
+                        {% endfor %}
+                    </div>
                     {% else %}
-                        <p class="text-gray-500 italic">No semesters added yet.</p>
+                    <p class="text-gray-500 italic">No semesters added yet.</p>
                     {% endif %}
                 </div>
             </div>
         </div>
         {% endfor %}
-    {% else %}
+        {% else %}
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
             <div class="flex items-start">
                 <i class="fas fa-info-circle text-blue-600 text-xl mr-3 mt-1"></i>
                 <div>
                     <h4 class="font-semibold text-blue-900 mb-1">No Curriculum Entries Found</h4>
-                    <p class="text-blue-800">Create curriculum entries to manage semester-by-semester course details.</p>
+                    <p class="text-blue-800">Create curriculum entries to manage semester-by-semester course details.
+                    </p>
                 </div>
             </div>
         </div>
-    {% endif %}
+        {% endif %}
 
-    <a href="{% url 'home:admin_dashboard' %}" class="inline-flex items-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold mt-6">
-        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-    </a>
-</div>
+        <a href="{% url 'home:admin_dashboard' %}"
+            class="inline-flex items-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold mt-6">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+        </a>
+    </div>
 </div>
 {% endblock %}
