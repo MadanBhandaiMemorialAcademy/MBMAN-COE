@@ -536,6 +536,12 @@ class CurriculumSemester(models.Model):
     description = models.TextField(
         blank=True, null=True, help_text="Optional semester description"
     )
+    syllabus_file = models.FileField(
+        upload_to="syllabus/",
+        blank=True,
+        null=True,
+        help_text="Upload PDF syllabus for this semester",
+    )
     display_order = models.IntegerField(default=0)
 
     class Meta:

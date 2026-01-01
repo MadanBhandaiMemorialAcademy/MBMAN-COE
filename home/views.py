@@ -998,7 +998,7 @@ def semester_add(request, curriculum_pk):
     curriculum = get_object_or_404(Curriculum, pk=curriculum_pk)
 
     if request.method == "POST":
-        form = CurriculumSemesterForm(request.POST)
+        form = CurriculumSemesterForm(request.POST, request.FILES)
         if form.is_valid():
             semester = form.save(commit=False)
             semester.curriculum = curriculum
@@ -1028,7 +1028,7 @@ def semester_edit(request, pk):
     semester = get_object_or_404(CurriculumSemester, pk=pk)
 
     if request.method == "POST":
-        form = CurriculumSemesterForm(request.POST, instance=semester)
+        form = CurriculumSemesterForm(request.POST, request.FILES, instance=semester)
         if form.is_valid():
             form.save()
             messages.success(request, "Semester updated successfully!")

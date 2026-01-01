@@ -11,7 +11,7 @@
             <h2 class="text-2xl font-bold text-gray-900">{{ title }}</h2>
         </div>
 
-        <form method="post" class="p-6 space-y-6">
+        <form method="post" enctype="multipart/form-data" class="p-6 space-y-6">
             {% csrf_token %}
             
             <div>
@@ -26,9 +26,20 @@
             <div>
                 <label for="{{ form.description.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">Description (Optional)</label>
                 {{ form.description }}
+
+
                 {% if form.description.errors %}
                     <p class="text-red-600 text-sm mt-1">{{ form.description.errors }}</p>
                 {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.syllabus_file.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">Syllabus PDF</label>
+                {{ form.syllabus_file }}
+                {% if form.syllabus_file.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.syllabus_file.errors }}</p>
+                {% endif %}
+                <p class="text-gray-500 text-sm mt-1">Upload PDF syllabus for this semester (Optional)</p>
             </div>
 
             <div>

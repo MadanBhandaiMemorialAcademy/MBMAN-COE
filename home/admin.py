@@ -206,7 +206,7 @@ class CurriculumSemesterAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Semester Information", {"fields": ("curriculum", "semester_number")}),
-        ("Content", {"fields": ("description", "display_order")}),
+        ("Content", {"fields": ("description", "syllabus_file", "display_order")}),
     )
     
 @admin.register(ProgramFeature)
