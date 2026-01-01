@@ -6,6 +6,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ site_config.college_name|default:"College of Engineering" }} - MBMAN{% endblock %}</title>
+    
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% block og_title %}{{ site_config.college_name|default:'MBMAN' }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ site_config.meta_description|default:site_config.tagline|default:'Excellence in Engineering Education' }}{% endblock %}">
+    <meta property="og:site_name" content="{{ site_config.college_name|default:'MBMAN' }}">
+    {% if site_logo and site_logo.logo %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_logo.logo.url }}">
+    {% endif %}
     {% if site_logo and site_logo.logo %}
     <link rel="icon" type="image/x-icon" href="{{ site_logo.logo.url }}">
     <link rel="apple-touch-icon" href="{{ site_logo.logo.url }}">
