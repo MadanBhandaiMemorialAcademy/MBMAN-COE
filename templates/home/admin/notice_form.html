@@ -4,6 +4,17 @@
 {% block title %}{{ title }} - Admin{% endblock %}
 {% block extra_css %}
 <link href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css" rel="stylesheet" type="text/css"/>
+<style>
+    /* CKEditor Custom Highlighting */
+    .ck-editor__editable_inline {
+        min-height: 200px;
+        border-color: #d1d5db !important;
+    }
+    .ck-editor__editable_inline:focus {
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 1px #2563eb !important;
+    }
+</style>
 {% endblock %}
 
 
@@ -122,8 +133,31 @@
 <script type="text/javascript">
     window.onload = function() {
         var mainInput = document.getElementById("nepali-datepicker");
-        mainInput.nepaliDatePicker();
+        if(mainInput) mainInput.nepaliDatePicker();
+
+        // CKEditor Initialization with Fallback
+        if (typeof ClassicEditor !== 'undefined') {
+            ClassicEditor
+                .create(document.querySelector('#id_description'), {
+                    toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'undo', 'redo'],
+                    heading: {
+                        options: [
+                            { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                            { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                            { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+                        ]
+                    }
+                })
+                .catch(error => {
+                    console.error('CKEditor initialization failed:', error);
+                    // Fallback is automatic: the textarea remains visible
+                });
+        } else {
+            console.warn('CKEditor CDN failed to load. Using text area fallback.');
+        }
     };
 </script>
+<script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js" onerror="console.error('CKEditor script failed to load');"></script>
 {% endblock %}
 {% endblock %}

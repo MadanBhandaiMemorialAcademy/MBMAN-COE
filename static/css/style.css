@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Form Styles */
+.form-input,
+.form-textarea,
+.form-select,
+.form-multiselect {
+    @apply block w-full rounded-md border-gray-400 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50;
+    border-color: #9ca3af; /* gray-400 fallback */
+}
+
+.form-checkbox {
+    @apply rounded border-gray-400 text-blue-600 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50;
+    border-color: #9ca3af;
+}
+
+/* Ensure borders are visible */
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="search"],
+input[type="tel"],
+input[type="time"],
+input[type="week"],
+textarea,
+select {
+    border-width: 1px;
+    border-color: #9ca3af; /* gray-400 */
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #2563eb; /* blue-600 */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}

@@ -64,6 +64,16 @@ class NoticeForm(forms.ModelForm):
             "is_active": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
         }
 
+    def clean_description(self):
+        description = self.cleaned_data.get("description")
+        if description:
+            import bleach
+            allowed_tags = ['p', 'b', 'i', 'u', 'em', 'strong', 'a', 'ul', 'ol', 'li', 'br', 'h1', 'h2', 'h3', 'blockquote']
+            # allow style attribute for text-align etc if needed, but for now stick to basics
+            allowed_attributes = {'a': ['href', 'title', 'target']}
+            return bleach.clean(description, tags=allowed_tags, attributes=allowed_attributes, strip=True)
+        return description
+
 
 class EventForm(forms.ModelForm):
     class Meta:
