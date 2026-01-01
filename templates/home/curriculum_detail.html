@@ -98,6 +98,15 @@
                         </tbody>
                     </table>
                 </div>
+                
+                {% if semester.syllabus_file %}
+                <div class="mt-6 text-center">
+                    <a href="{{ semester.syllabus_file.url }}" target="_blank" class="inline-flex items-center px-6 py-3 {{ program.get_color_classes.bg }} text-white font-semibold rounded-lg hover:opacity-90 transition shadow-md group">
+                        <i class="fas fa-file-download mr-2 group-hover:animate-bounce"></i>
+                        Download Syllabus (PDF)
+                    </a>
+                </div>
+                {% endif %}
                 {% else %}
                 <div class="text-center py-8 text-gray-500">
                     <i class="fas fa-book-open text-4xl mb-3"></i>

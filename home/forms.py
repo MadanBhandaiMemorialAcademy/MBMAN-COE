@@ -445,7 +445,7 @@ class CurriculumForm(forms.ModelForm):
 class CurriculumSemesterForm(forms.ModelForm):
     class Meta:
         model = CurriculumSemester
-        fields = ["semester_number", "description", "display_order"]
+        fields = ["semester_number", "description", "syllabus_file", "display_order"]
         widgets = {
             "semester_number": forms.NumberInput(
                 attrs={"class": "form-input", "min": "1", "max": "8"}
@@ -456,6 +456,9 @@ class CurriculumSemesterForm(forms.ModelForm):
                     "rows": 3,
                     "placeholder": "Optional semester description",
                 }
+            ),
+            "syllabus_file": forms.FileInput(
+                attrs={"class": "form-input", "accept": ".pdf"}
             ),
             "display_order": forms.NumberInput(
                 attrs={"class": "form-input", "placeholder": "Display order"}
