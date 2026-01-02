@@ -191,11 +191,13 @@ urlpatterns = [
     path("admin/albums/add/", views.album_add, name="album_add"),
     path("admin/albums/<int:pk>/edit/", views.album_edit, name="album_edit"),
     path("admin/albums/<int:pk>/delete/", views.album_delete, name="album_delete"),
+    path("admin/albums/reorder/", views.album_reorder, name="album_reorder"),
     # Gallery Management
     path("admin/gallery/", views.gallery_list, name="gallery_list"),
     path("admin/gallery/add/", views.gallery_add, name="gallery_add"),
     path("admin/gallery/<int:pk>/edit/", views.gallery_edit, name="gallery_edit"),
     path("admin/gallery/<int:pk>/delete/", views.gallery_delete, name="gallery_delete"),
+    path("admin/gallery/bulk-action/", views.gallery_bulk_action, name="gallery_bulk_action"),
     path("admin/gallery/reorder/", views.gallery_reorder, name="gallery_reorder"),
     # About Sections
     path("admin/about-sections/", views.about_section_list, name="about_section_list"),

@@ -42,3 +42,19 @@ select:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
+
+/* SortableJS Modern Styles */
+.sortable-drag {
+    opacity: 1 !important;
+    background-color: white !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    transform: scale(1.05);
+    cursor: grabbing !important;
+    z-index: 9999 !important;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: #eff6ff; /* blue-50 */
+    border: 2px dashed #3b82f6; /* blue-500 */
+}

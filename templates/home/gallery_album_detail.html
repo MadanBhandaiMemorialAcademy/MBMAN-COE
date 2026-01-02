@@ -31,8 +31,12 @@
         {% if gallery_images %}
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="gallery-grid">
             {% for image in gallery_images %}
-            <div class="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer" onclick="openLightbox('{{ image.image.url }}', '{{ image.caption|escapejs }}')">
-                <div class="aspect-w-4 aspect-h-3 overflow-hidden bg-gray-200">
+            <div class="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer gallery-item" 
+                 data-src="{{ image.image.url }}" 
+                 data-caption="{{ image.caption|escapejs }}"
+                 data-index="{{ forloop.counter0 }}"
+                 onclick="openLightbox({{ forloop.counter0 }})">
+                <div class="h-64 overflow-hidden bg-gray-200">
                     <img src="{{ image.image.url }}" alt="{{ image.caption|default:'Gallery Image' }}" 
                          class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
                 </div>
@@ -87,39 +91,106 @@
     </div>
 </div>
 
-<!-- Lightbox Modal (Same as before) -->
+<!-- Lightbox Modal -->
 <div id="lightbox" class="fixed inset-0 z-[60] hidden" aria-modal="true">
     <div class="absolute inset-0 bg-black/90 backdrop-blur-sm transition-opacity" onclick="closeLightbox()"></div>
     <div class="relative min-h-screen flex items-center justify-center p-4">
         <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white hover:text-gray-300 z-50 p-2">
             <i class="fas fa-times text-2xl"></i>
         </button>
+        
+        <!-- Navigation Buttons -->
+        <button onclick="prevImage(event)" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-50 p-4 bg-black/20 hover:bg-black/40 rounded-full transition-colors hidden md:block" id="prev-btn">
+            <i class="fas fa-chevron-left text-3xl"></i>
+        </button>
+        <button onclick="nextImage(event)" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-50 p-4 bg-black/20 hover:bg-black/40 rounded-full transition-colors hidden md:block" id="next-btn">
+            <i class="fas fa-chevron-right text-3xl"></i>
+        </button>
+
         <div class="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center">
-            <img id="lightbox-img" src="" alt="Full size" class="max-w-full max-h-[80vh] object-contain rounded shadow-2xl">
+            <img id="lightbox-img" src="" alt="Full size" class="max-w-full max-h-[80vh] object-contain rounded shadow-2xl transition-opacity duration-300">
             <p id="lightbox-caption" class="text-white mt-4 text-lg font-medium text-center"></p>
         </div>
     </div>
 </div>
 
 <script>
-    function openLightbox(src, caption) {
+    let currentImageIndex = 0;
+    let galleryItems = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize gallery items
+        const items = document.querySelectorAll('.gallery-item');
+        galleryItems = Array.from(items).map(item => ({
+            src: item.dataset.src,
+            caption: item.dataset.caption
+        }));
+    });
+
+    function openLightbox(index) {
+        if (galleryItems.length === 0) return;
+        
+        currentImageIndex = index;
+        updateLightboxContent();
+        
         const lightbox = document.getElementById('lightbox');
-        const img = document.getElementById('lightbox-img');
-        const cap = document.getElementById('lightbox-caption');
-        img.src = src;
-        cap.textContent = caption || '';
         lightbox.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
-        lightbox.firstElementChild.classList.remove('opacity-0');
-        lightbox.firstElementChild.classList.add('opacity-100');
+        
+        // Animation
+        setTimeout(() => {
+            lightbox.firstElementChild.classList.remove('opacity-0');
+            lightbox.firstElementChild.classList.add('opacity-100');
+        }, 10);
     }
+
+    function updateLightboxContent() {
+        const item = galleryItems[currentImageIndex];
+        const img = document.getElementById('lightbox-img');
+        const cap = document.getElementById('lightbox-caption');
+        
+        // Simple fade effect
+        img.style.opacity = '0';
+        setTimeout(() => {
+            img.src = item.src;
+            cap.textContent = item.caption || '';
+            img.style.opacity = '1';
+        }, 150);
+        
+        // Update navigation buttons visibility (optional, currently always showing if items exist)
+        // toggleNavButtons();
+    }
+
     function closeLightbox() {
         const lightbox = document.getElementById('lightbox');
-        lightbox.classList.add('hidden');
-        document.body.style.overflow = '';
+        lightbox.firstElementChild.classList.remove('opacity-100');
+        lightbox.firstElementChild.classList.add('opacity-0');
+        
+        setTimeout(() => {
+            lightbox.classList.add('hidden');
+            document.body.style.overflow = '';
+        }, 300);
     }
+
+    function prevImage(e) {
+        if (e) e.stopPropagation();
+        currentImageIndex = (currentImageIndex - 1 + galleryItems.length) % galleryItems.length;
+        updateLightboxContent();
+    }
+
+    function nextImage(e) {
+        if (e) e.stopPropagation();
+        currentImageIndex = (currentImageIndex + 1) % galleryItems.length;
+        updateLightboxContent();
+    }
+
     document.addEventListener('keydown', function(e) {
+        const lightbox = document.getElementById('lightbox');
+        if (lightbox.classList.contains('hidden')) return;
+
         if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') prevImage();
+        if (e.key === 'ArrowRight') nextImage();
     });
 </script>
 {% endblock %}
