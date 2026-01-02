@@ -53,7 +53,7 @@
                                     </span>
                                     {% endif %}
                                 </div>
-                                <p class="text-gray-600 mb-2 line-clamp-2">{{ notice.description|truncatewords:30 }}</p>
+                                <p class="text-gray-600 mb-2 line-clamp-2">{{ notice.description|striptags|truncatewords:30 }}</p>
                                 <div class="flex items-center text-sm text-gray-500">
                                     {% if notice.file or notice.image %}
                                     <div class="flex items-center gap-2">

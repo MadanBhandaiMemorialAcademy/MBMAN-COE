@@ -16,10 +16,10 @@
                     <p class="text-gray-500 mt-1">Upload and manage images. Drag to reorder.</p>
                 </div>
                 <div class="flex space-x-3">
-                    <a href="{% url 'home:admin_dashboard' %}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                    <a href="{% url 'home:album_list' %}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Albums
                     </a>
-                    <a href="{% url 'home:gallery_add' %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    <a href="{% url 'home:gallery_add' %}{% if current_album_id %}?album_id={{ current_album_id }}{% endif %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-cloud-upload-alt mr-2"></i>Add Photo
                     </a>
                 </div>
@@ -38,52 +38,103 @@
         {% endif %}
 
         <!-- Gallery Grid (Sortable) -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            {% if images %}
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="sortable-gallery">
-                {% for image in images %}
-                <div class="relative group bg-gray-50 rounded-lg border border-gray-200 p-2 cursor-move" data-id="{{ image.pk }}">
-                    <div class="aspect-w-1 aspect-h-1 overflow-hidden rounded bg-gray-200 mb-2">
-                        <img src="{{ image.image.url }}" alt="Gallery Image" class="object-cover w-full h-full">
-                        {% if image.is_spotlight %}
-                        <div class="absolute top-2 right-2 bg-yellow-400 text-white text-xs px-2 py-1 rounded-full shadow-sm" title="Spotlight Image">
-                            <i class="fas fa-star"></i>
-                        </div>
-                        {% endif %}
-                    </div>
+        <form method="post" action="{% url 'home:gallery_bulk_action' %}" id="bulk-action-form">
+            {% csrf_token %}
+            {% if current_album_id %}
+            <input type="hidden" name="source_album_id" value="{{ current_album_id }}">
+            {% endif %}
+            <div class="bg-white rounded-lg shadow-md p-6">
+                
+                <!-- Bulk Actions Toolbar -->
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 pb-4 border-b border-gray-100 gap-4">
                     
-                    <div class="text-xs text-gray-500 truncate mb-2">
-                        {{ image.caption|default:"(No caption)" }}
+                    <!-- Selection and Selection Counter -->
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="select-all" class="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer">
+                            <label for="select-all" class="ml-2 text-sm font-medium text-gray-700 cursor-pointer">Select All</label>
+                        </div>
+                        <span id="selection-count" class="text-xs font-semibold bg-gray-100 text-gray-600 px-2 py-1 rounded hidden">0 selected</span>
                     </div>
 
-                    <!-- Actions -->
-                    <div class="flex justify-between items-center pt-2 border-t border-gray-200">
-                        <div class="text-gray-400 cursor-move hover:text-gray-600">
-                            <i class="fas fa-grip-horizontal"></i>
-                        </div>
-                        <div class="flex space-x-2">
-                            <a href="{% url 'home:gallery_edit' image.pk %}" class="text-blue-600 hover:text-blue-800" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form method="post" action="{% url 'home:gallery_delete' image.pk %}" class="inline" onsubmit="return confirm('Delete this image?');">
-                                {% csrf_token %}
-                                <button type="submit" class="text-red-600 hover:text-red-800" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
+                    <!-- Action Controls -->
+                    <div class="flex items-center space-x-3 w-full md:w-auto">
+                        <select name="target_album" id="target-album-select" class="block w-full md:w-48 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm disabled:opacity-50 disabled:bg-gray-100" disabled>
+                            <option value="">-- Target Album --</option>
+                            {% for alb in albums %}
+                            <option value="{{ alb.id }}">{{ alb.title }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <button type="submit" name="action" value="move" id="move-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <i class="fas fa-share mr-2"></i> Move
+                        </button>
+                        
+                        <button type="submit" name="action" value="copy" id="copy-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <i class="fas fa-copy mr-2"></i> Copy
+                        </button>
+
+                        <div class="h-6 w-px bg-gray-300 mx-2"></div>
+
+                        <button type="submit" name="action" value="delete" id="delete-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed" disabled onclick="return confirm('Are you sure you want to delete the selected images? This cannot be undone.');">
+                            <i class="fas fa-trash-alt mr-2"></i> Delete
+                        </button>
                     </div>
                 </div>
-                {% endfor %}
+
+                {% if images %}
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="sortable-gallery">
+                    {% for image in images %}
+                    <div class="relative group bg-gray-50 rounded-lg border border-gray-200 p-2 cursor-move flex flex-col h-full hover:border-blue-400 hover:shadow-md transition duration-200 selectable-card" data-id="{{ image.pk }}">
+                        <!-- Styled Selection Checkbox -->
+                        <div class="absolute top-2 left-2 z-20">
+                            <div class="relative">
+                                <input type="checkbox" name="image_ids" value="{{ image.pk }}" class="image-checkbox peer appearance-none w-6 h-6 border-2 border-white rounded shadow-sm bg-white checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-colors">
+                                <i class="fas fa-check text-white absolute top-1 left-1 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <div class="h-48 overflow-hidden rounded bg-gray-200 mb-2 relative">
+                            <img src="{{ image.image.url }}" alt="Gallery Image" class="object-cover w-full h-full transition duration-500 group-hover:scale-105">
+                            
+                            {% if image.is_spotlight %}
+                            <div class="absolute top-2 right-2 bg-yellow-400 text-white text-xs px-2 py-1 rounded-full shadow-sm z-10" title="Spotlight Image">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="text-xs text-gray-500 truncate mb-2 pl-1 font-medium">
+                            {{ image.caption|default:"(No caption)" }}
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-200 mt-auto">
+                            {% if current_album_id %}
+                            <div class="bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 cursor-move handle px-3 py-2 rounded-md transition shadow-sm" title="Drag to reorder">
+                                <i class="fas fa-arrows-alt"></i>
+                            </div>
+                            {% else %}
+                            <div><!-- Spacer for layout balance --></div>
+                            {% endif %}
+                            <div class="flex space-x-2">
+                                <a href="{% url 'home:gallery_edit' image.pk %}" class="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50 transition" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12 text-gray-500">
+                    <i class="fas fa-images text-4xl mb-4 text-gray-300"></i>
+                    <p>No images in gallery.</p>
+                    <a href="{% url 'home:gallery_add' %}" class="text-blue-600 hover:underline mt-2 inline-block">Upload your first photo</a>
+                </div>
+                {% endif %}
             </div>
-            {% else %}
-            <div class="text-center py-12 text-gray-500">
-                <i class="fas fa-images text-4xl mb-4 text-gray-300"></i>
-                <p>No images in gallery.</p>
-                <a href="{% url 'home:gallery_add' %}" class="text-blue-600 hover:underline mt-2 inline-block">Upload your first photo</a>
-            </div>
-            {% endif %}
-        </div>
+        </form>
 
     </div>
 </div>
@@ -92,11 +143,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Sortable Setup - Only enable if we are in an album view (current_album_id is present)
+        {% if current_album_id %}
         const sortableList = document.getElementById('sortable-gallery');
         if (sortableList) {
             new Sortable(sortableList, {
                 animation: 150,
-                ghostClass: 'bg-blue-50',
+                handle: '.handle', // Only drag via handle
+                ghostClass: 'bg-blue-100',
                 onEnd: function(evt) {
                     const items = sortableList.querySelectorAll('div[data-id]');
                     const order = Array.from(items).map(item => item.dataset.id);
@@ -121,6 +175,66 @@
                     });
                 }
             });
+        }
+        {% endif %}
+
+        // Bulk Selection Logic
+        const selectAllCheckbox = document.getElementById('select-all');
+        const imageCheckboxes = document.querySelectorAll('.image-checkbox');
+        const selectionCount = document.getElementById('selection-count');
+        const targetAlbumSelect = document.getElementById('target-album-select');
+        
+        const moveBtn = document.getElementById('move-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const deleteBtn = document.getElementById('delete-btn');
+
+        function updateActionState() {
+            const checkedBoxes = Array.from(imageCheckboxes).filter(cb => cb.checked);
+            const count = checkedBoxes.length;
+            const hasSelection = count > 0;
+            const hasTarget = targetAlbumSelect.value !== "";
+
+            // Update UI Counters
+            selectionCount.textContent = `${count} selected`;
+            selectionCount.classList.toggle('hidden', count === 0);
+
+            // Toggle Card Active State
+            imageCheckboxes.forEach(cb => {
+                const card = cb.closest('.group');
+                if (cb.checked) {
+                    card.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50');
+                } else {
+                    card.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50');
+                }
+            });
+
+            // Enable/Disable Controls
+            targetAlbumSelect.disabled = !hasSelection;
+            deleteBtn.disabled = !hasSelection;
+
+            // Move/Copy depend on both selection AND target album
+            moveBtn.disabled = !(hasSelection && hasTarget);
+            copyBtn.disabled = !(hasSelection && hasTarget);
+        }
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                const isChecked = this.checked;
+                imageCheckboxes.forEach(cb => cb.checked = isChecked);
+                updateActionState();
+            });
+        }
+
+        imageCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                const allChecked = Array.from(imageCheckboxes).every(c => c.checked);
+                if (selectAllCheckbox) selectAllCheckbox.checked = allChecked;
+                updateActionState();
+            });
+        });
+
+        if (targetAlbumSelect) {
+            targetAlbumSelect.addEventListener('change', updateActionState);
         }
     });
 </script>

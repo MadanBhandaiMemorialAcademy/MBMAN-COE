@@ -806,21 +806,40 @@ class GalleryAlbumForm(forms.ModelForm):
         }
 
 
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+    def value_from_datadict(self, data, files, name):
+        # Return only the first file to allow standard FileField validation to pass
+        # The view will handle the full list via request.FILES.getlist()
+        if hasattr(files, 'get'):
+            return files.get(name)
+        return None
+
+
 class GalleryImageForm(forms.ModelForm):
     class Meta:
         model = GalleryImage
         fields = ["album", "caption", "image", "is_spotlight", "is_cover", "display_order"]
         widgets = {
-            "album": forms.Select(attrs={"class": "form-input"}),
-            "caption": forms.TextInput(
-                attrs={"class": "form-input", "placeholder": "Image caption (optional)"}
-            ),
-            "image": forms.FileInput(attrs={"class": "form-input"}),
+            "image": MultipleFileInput(attrs={
+                "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500",
+                "multiple": True
+            }),
+            "album": forms.Select(attrs={
+                "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+            }),
+            "caption": forms.TextInput(attrs={
+                "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500",
+                "placeholder": "Enter caption..."
+            }),
             "is_spotlight": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
             "is_cover": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
-            "display_order": forms.NumberInput(
-                attrs={"class": "form-input", "placeholder": "Display order"}
-            ),
+            "display_order": forms.NumberInput(attrs={
+                "class": "w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+            }),
+             # Checkboxes don't need these width classes usually
         }
 
 

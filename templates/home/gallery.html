@@ -24,7 +24,7 @@
             {% for album in albums %}
             <a href="{% url 'home:gallery_album_detail' album.pk %}" class="group block bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
                 <!-- Cover Image Area -->
-                <div class="relative aspect-w-16 aspect-h-9 bg-gray-200 overflow-hidden">
+                <div class="relative aspect-video bg-gray-200 overflow-hidden">
                     {% with covers=album.get_cover_images %}
                     {% if covers|length > 1 %}
                         <!-- Slideshow for multiple covers -->

@@ -36,16 +36,23 @@
                 </div>
                 {% endif %}
 
-                <!-- Album -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Album</label>
-                    {{ form.album }}
-                    <p class="mt-1 text-xs text-gray-500">Select an album for this photo.</p>
-                </div>
+                <!-- Album Field (Conditional) -->
+                {% if target_album %}
+                    <input type="hidden" name="album" value="{{ target_album.id }}">
+                {% else %}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.album.label }}</label>
+                        {{ form.album }}
+                        {% if form.album.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.album.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500">Select an album for this photo.</p>
+                    </div>
+                {% endif %}
 
-                <!-- Image Upload -->
+                <!-- Image Field -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Image *</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.image.label }} *</label>
                     {% if image and image.image %}
                     <div class="mb-4">
                         <img src="{{ image.image.url }}" alt="Current Image" class="h-48 object-cover rounded-lg border border-gray-200">
@@ -53,17 +60,23 @@
                     </div>
                     {% endif %}
                     {{ form.image }}
-                    <p class="mt-1 text-xs text-gray-500">Recommended: High quality JPG/PNG.</p>
+                    <p class="text-gray-500 text-xs mt-1">Recommended: High quality JPG/PNG. You can select multiple images.</p>
+                    {% if form.image.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.image.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
-                <!-- Caption -->
+                <!-- Caption Field -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Caption</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.caption.label }}</label>
                     {{ form.caption }}
+                    {% if form.caption.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.caption.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
                 <!-- Spotlight & Cover -->
-                <div class="space-y-3">
+                <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
                     <label class="flex items-center space-x-3 cursor-pointer">
                         {{ form.is_spotlight }}
                         <span class="text-sm font-medium text-gray-900">Feature in Homepage Spotlight</span>
@@ -76,7 +89,7 @@
 
                 <!-- Display Order -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.display_order.label }}</label>
                     {{ form.display_order }}
                     <p class="mt-1 text-xs text-gray-500">Lower numbers appear first.</p>
                 </div>

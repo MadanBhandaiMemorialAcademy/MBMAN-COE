@@ -184,7 +184,7 @@
                         </div>
                         <div class="flex-1">
                             <h3 class="font-bold {% if notice.priority == 'urgent' %}text-red-700{% else %}text-gray-800{% endif %} text-lg mb-2 hover:text-mbman-blue transition">{% if notice.priority == 'urgent' %}URGENT: {% endif %}{{ notice.title }}</h3>
-                            <p class="{% if notice.priority == 'urgent' %}text-red-600/80{% else %}text-gray-600{% endif %} text-sm line-clamp-2">{{ notice.description }}</p>
+                            <p class="{% if notice.priority == 'urgent' %}text-red-600/80{% else %}text-gray-600{% endif %} text-sm line-clamp-2">{{ notice.description|striptags }}</p>
                             {% if notice.file or notice.image %}
                             <div class="inline-block mt-2 text-xs text-mbman-blue">
                                 {% if notice.file %}<i class="fas fa-file-pdf mr-1"></i>{% endif %}

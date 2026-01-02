@@ -1,7 +1,11 @@
+import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import models
+from django.db.models import Count
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from .forms import (
@@ -1577,36 +1581,90 @@ def album_delete(request, pk):
 def gallery_list(request):
     """List all gallery images"""
     filter_type = request.GET.get("filter")
+    album_id = request.GET.get("album_id")
     images = GalleryImage.objects.all()
     title = "Manage Photo Gallery"
 
     if filter_type == "spotlight":
         images = images.filter(is_spotlight=True)
         title = "Manage Spotlight Images"
+    
+    if album_id:
+        album = get_object_or_404(GalleryAlbum, pk=album_id)
+        images = images.filter(album=album)
+        title = f"Manage Photos: {album.title}"
 
     images = images.order_by("display_order", "-created_at")
+    albums = GalleryAlbum.objects.all().order_by("-created_at")
     return render(
         request,
         "home/admin/gallery_list.html",
-        {"images": images, "title": title, "filter": filter_type},
+        {"images": images, "albums": albums, "title": title, "filter": filter_type, "current_album_id": int(album_id) if album_id else None},
     )
 
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def gallery_add(request):
     """Add new gallery image"""
+    album_id = request.GET.get("album_id")
+    initial_data = {}
+    target_album = None
+    
+    if album_id:
+        target_album = get_object_or_404(GalleryAlbum, pk=album_id)
+        initial_data['album'] = target_album
+
     if request.method == "POST":
         form = GalleryImageForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Image added to gallery!")
+            images = request.FILES.getlist('image')  # Get list of images
+            if len(images) > 1:
+                # Handle bulk upload
+                album = form.cleaned_data['album']
+                caption = form.cleaned_data['caption']
+                is_spotlight = form.cleaned_data['is_spotlight']
+                is_cover = form.cleaned_data['is_cover']
+                display_order = form.cleaned_data['display_order'] or 0
+
+                count = 0
+                for img in images:
+                    GalleryImage.objects.create(
+                        album=album,
+                        image=img,
+                        caption=caption,  # Same caption for all? Or default?
+                        is_spotlight=is_spotlight,
+                        is_cover=is_cover, # If multiple, maybe only first should be cover? Or all? 
+                        # Giving all is_cover=True might be weird but it's what the user asked (bulk add)
+                        display_order=display_order + count
+                    )
+                    count += 1
+                
+                messages.success(request, f"{count} images added to gallery!")
+            else:
+                # Normal single upload (fallback to standard save)
+                form.save()
+                messages.success(request, "Image added to gallery!")
+            
+            # Redirect back to the specific album list if we have context
+            if album_id:
+                 return redirect(f"{reverse('home:gallery_list')}?album_id={album_id}")
             return redirect("home:gallery_list")
     else:
-        form = GalleryImageForm()
+        form = GalleryImageForm(initial=initial_data)
+        # If we have a target album, we might want to hide the album field in the template or make it readonly.
+        # We can pass the target_album to the template to conditional rendering.
 
     return render(
-        request, "home/admin/gallery_form.html", {"form": form, "title": "Add Gallery Image"}
+        request, 
+        "home/admin/gallery_form.html", 
+        {
+            "form": form, 
+            "title": f"Add Photos to {target_album.title}" if target_album else "Add Gallery Image",
+            "target_album": target_album
+        }
     )
 
 
@@ -1641,6 +1699,102 @@ def gallery_delete(request, pk):
     image.delete()
     messages.success(request, "Gallery image deleted!")
     return redirect("home:gallery_list")
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def gallery_bulk_action(request):
+    """Handle bulk actions for gallery images: delete, move, copy"""
+    action = request.POST.get("action")
+    image_ids = request.POST.getlist("image_ids")
+    target_album_id = request.POST.get("target_album")
+
+    if not image_ids:
+        messages.warning(request, "No images selected.")
+        return redirect("home:gallery_list")
+
+    images = GalleryImage.objects.filter(id__in=image_ids)
+    count = images.count()
+    
+    if action == "delete":
+        images.delete()
+        messages.success(request, f"{count} images deleted successfully!")
+
+    elif action == "move":
+        if not target_album_id:
+            messages.error(request, "Target album not selected for move.")
+        else:
+            target_album = get_object_or_404(GalleryAlbum, pk=target_album_id)
+            updated_count = images.update(album=target_album)
+            messages.success(request, f"{updated_count} images moved to '{target_album.title}'!")
+
+    elif action == "copy":
+        if not target_album_id:
+            messages.error(request, "Target album not selected for copy.")
+        else:
+            target_album = get_object_or_404(GalleryAlbum, pk=target_album_id)
+            copied_count = 0
+            for img in images:
+                # Create a new instance pointing to the same file
+                # We use the same file field, which just stores the path.
+                # Note: If the original file is deleted, this reference might break if standard Django cleanup handles it.
+                # However, Django defaults do NOT delete files when models are deleted unless custom logic exists.
+                # So this is generally safe for "reference" style copying.
+                GalleryImage.objects.create(
+                    album=target_album,
+                    image=img.image, 
+                    caption=img.caption,
+                    is_spotlight=img.is_spotlight,
+                    is_cover=False, # Reset cover for copy usually
+                    display_order=img.display_order
+                )
+                copied_count += 1
+            messages.success(request, f"{copied_count} images copied to '{target_album.title}'!")
+
+    else:
+        messages.warning(request, "Invalid action selected.")
+
+    # Redirect back to source album if we came from one
+    source_album_id = request.POST.get("source_album_id")
+    if source_album_id:
+        return redirect(f"{reverse('home:gallery_list')}?album_id={source_album_id}")
+    
+    return redirect("home:gallery_list")
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def gallery_reorder(request):
+    """Handle drag-and-drop reordering for images"""
+    try:
+        data = json.loads(request.body)
+        order = data.get("order", [])
+        
+        for index, pk in enumerate(order):
+            GalleryImage.objects.filter(pk=pk).update(display_order=index)
+            
+        return JsonResponse({"status": "success"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+@require_POST
+def album_reorder(request):
+    """Handle drag-and-drop reordering for albums"""
+    try:
+        data = json.loads(request.body)
+        order = data.get("order", [])
+        
+        for index, pk in enumerate(order):
+            GalleryAlbum.objects.filter(pk=pk).update(display_order=index)
+            
+        return JsonResponse({"status": "success"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
 
 @login_required
