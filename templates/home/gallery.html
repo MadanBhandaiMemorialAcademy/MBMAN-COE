@@ -62,7 +62,10 @@
                     {% endif %}
                     <div class="flex items-center justify-between text-xs text-gray-500 border-t border-gray-100 pt-4">
                         <span><i class="fas fa-camera mr-1"></i> {{ album.images.count }} Photos</span>
-                        <span><i class="far fa-calendar-alt mr-1"></i> {{ album.created_at|date:"M d, Y" }}</span>
+                        <span>
+                            <i class="far fa-calendar-alt mr-1"></i> 
+                            {% if album.date_bs %}{{ album.date_bs }}{% else %}{{ album.created_at|date:"M d, Y" }}{% endif %}
+                        </span>
                     </div>
                 </div>
             </a>

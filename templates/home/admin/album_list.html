@@ -43,9 +43,23 @@
                 <div class="absolute top-2 right-2 z-50 bg-white/90 backdrop-blur rounded shadow-sm text-gray-500 hover:text-blue-600 cursor-move handle p-2 transition border border-gray-200" title="Drag to reorder">
                     <i class="fas fa-arrows-alt"></i>
                 </div>
+                
+                <!-- Edit/Delete Actions (Top Left) -->
+                <div class="absolute top-2 left-2 z-50 flex space-x-2">
+                    <a href="{% url 'home:album_edit' album.pk %}" class="bg-white/90 backdrop-blur p-2 rounded shadow-sm text-blue-600 hover:text-blue-800 border border-gray-200 hover:border-blue-300 transition" title="Edit Album">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form method="post" action="{% url 'home:album_delete' album.pk %}" class="inline" onsubmit="return confirm('Delete album? Photos inside will be deleted too.');">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-white/90 backdrop-blur p-2 rounded shadow-sm text-red-600 hover:text-red-800 border border-gray-200 hover:border-red-300 transition" title="Delete Album">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+
                 <a href="{% url 'home:gallery_list' %}?album_id={{ album.pk }}" class="block h-full">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2 pr-8">
+                    <div class="px-6 pb-6 pt-16">
+                        <div class="flex justify-between items-start mb-2">
                             <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ album.title }}</h3>
                         </div>
                         <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ album.description|default:"No description" }}</p>
@@ -56,19 +70,15 @@
                 </a>
                         
                 <!-- Actions Row -->
-                <div class="flex justify-between items-center border-t border-gray-100 pt-4 px-6 pb-6 relative z-20">
-                    <span class="text-xs text-gray-400">{{ album.created_at|date:"M d, Y" }}</span>
-                    <div class="flex space-x-2">
-                        <a href="{% url 'home:album_edit' album.pk %}" class="text-blue-600 hover:text-blue-800 p-1">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form method="post" action="{% url 'home:album_delete' album.pk %}" class="inline" onsubmit="return confirm('Delete album? Photos inside will be deleted too.');">
-                            {% csrf_token %}
-                            <button type="submit" class="text-red-600 hover:text-red-800 p-1">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                    </div>
+                <div class="border-t border-gray-100 pt-4 px-6 pb-6 relative z-20">
+                    <span class="text-xs text-gray-400">
+                        <i class="far fa-calendar-alt mr-1"></i> 
+                        {% if album.date_bs %}
+                            {{ album.date_bs }}
+                        {% else %}
+                            {{ album.created_at|date:"M d, Y" }}
+                        {% endif %}
+                    </span>
                 </div>
             </div>
             {% empty %}

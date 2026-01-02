@@ -788,7 +788,7 @@ class ImageSlideshowForm(forms.ModelForm):
 class GalleryAlbumForm(forms.ModelForm):
     class Meta:
         model = GalleryAlbum
-        fields = ["title", "description", "display_order"]
+        fields = ["title", "description", "date_bs", "display_order"]
         widgets = {
             "title": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "Album title"}
@@ -798,6 +798,13 @@ class GalleryAlbumForm(forms.ModelForm):
                     "class": "form-input",
                     "rows": 3,
                     "placeholder": "Album description",
+                }
+            ),
+            "date_bs": forms.TextInput(
+                attrs={
+                    "class": "form-input",
+                    "placeholder": "YYYY-MM-DD",
+                    "id": "nepali-datepicker",
                 }
             ),
             "display_order": forms.NumberInput(

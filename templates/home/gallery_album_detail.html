@@ -18,7 +18,8 @@
                 {% endif %}
             </div>
             <div class="text-gray-500 text-sm">
-                <i class="far fa-calendar-alt mr-2"></i> {{ album.created_at|date:"F j, Y" }}
+                <i class="far fa-calendar-alt mr-2"></i> 
+                {% if album.date_bs %}{{ album.date_bs }}{% else %}{{ album.created_at|date:"F j, Y" }}{% endif %}
             </div>
         </div>
     </div>
