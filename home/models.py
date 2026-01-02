@@ -796,6 +796,7 @@ class GalleryAlbum(models.Model):
 
     title = models.CharField(max_length=200, help_text="Album title")
     description = models.TextField(blank=True, null=True, help_text="Optional description")
+    date_bs = models.CharField(max_length=50, blank=True, null=True, help_text="Date in Bikram Sambat")
     display_order = models.IntegerField(default=0, help_text="Order of display")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

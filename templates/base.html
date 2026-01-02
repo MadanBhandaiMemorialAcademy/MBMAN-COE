@@ -94,7 +94,7 @@
                             <i class="fas fa-chevron-down text-xs ml-2 transition-transform"></i>
                         </button>
                         <div id="user-dropdown-menu" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-xl z-50 border border-gray-100 py-1 overflow-hidden">
-                            <a href="{% url 'home:manage_account' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-mbman-blue transition">Manage Account</a>
+
                             {% if user.is_staff %}
                             <a href="{% url 'home:admin_dashboard' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-mbman-blue transition">Dashboard</a>
                             {% endif %}
@@ -138,9 +138,7 @@
                         <span class="text-gray-700 font-medium">Welcome, {{ user.username }}</span>
                     </div>
                     <div class="flex flex-col space-y-2 mt-4">
-                        <a href="{% url 'home:manage_account' %}" class="block w-full text-left px-5 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition font-medium">
-                            Manage Account
-                        </a>
+
                         {% if user.is_staff %}
                         <a href="{% url 'home:admin_dashboard' %}" class="block w-full text-left px-5 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition font-medium">
                             Dashboard
